@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#050b14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JalNetra">
+<title>JalNetra AI — Team AquaLens · SIH26040</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"JalNetra AI","short_name":"JalNetra","display":"standalone","background_color":"%23050b14","theme_color":"%2322d3ee","start_url":"."}'>
+<style>
+:root{
+  --bg:#050b14; --bg2:#081221; --panel:#0b1626; --panel2:#0e1c31; --line:#1b2d4a;
+  --txt:#eaf2fb; --mut:#7e93b0; --cy:#22d3ee; --ok:#34d399; --warn:#fbbf24; --crit:#f87171;
+  --vio:#a78bfa; --pink:#f472b6; --shadow:0 20px 60px rgba(0,0,0,.5);
+}
+[data-theme="light"]{
+  --bg:#eef3f9; --bg2:#e4ecf5; --panel:#ffffff; --panel2:#f2f6fb; --line:#d3deec;
+  --txt:#12233c; --mut:#5b7291; --cy:#0891b2; --ok:#059669; --warn:#b45309; --crit:#dc2626;
+  --vio:#7c3aed; --shadow:0 16px 40px rgba(30,60,100,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;transition:background .3s,color .3s}
+button,select{font-family:inherit}
+/* ============ TOP BAR ============ */
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topin{max-width:1420px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lg{width:34px;height:34px;flex:none}
+.logo b{font-size:18px;letter-spacing:.2px}
+.logo b span{color:var(--cy)}
+.logo small{display:block;font-size:10px;color:var(--mut);letter-spacing:.6px}
+.tctl{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.sel{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12.5px;outline:none;cursor:pointer}
+.tbn{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:14px;cursor:pointer}
+.tbn:hover{border-color:var(--cy)}
+.live{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--ok) 35%,transparent);padding:6px 12px;border-radius:20px;font-weight:800}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:p 1.6s infinite}
+@keyframes p{50%{opacity:.35}}
+/* ============ TABS ============ */
+.tabs{max-width:1420px;margin:0 auto;padding:4px 20px 0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tb{font-size:13px;font-weight:700;color:var(--mut);padding:10px 16px;border-radius:12px 12px 0 0;cursor:pointer;white-space:nowrap;border:1px solid transparent;border-bottom:none}
+.tb.on{color:var(--cy);background:var(--bg);border-color:var(--line)}
+.tb:hover{color:var(--txt)}
+.tb .ic{margin-right:6px}
+/* ============ LAYOUT ============ */
+.main{max-width:1420px;margin:0 auto;padding:20px}
+.page{display:none;animation:f .35s}
+.page.on{display:block}
+@keyframes f{from{opacity:0;transform:translateY(10px)}}
+.grid{display:grid;gap:16px}
+.g-dash{grid-template-columns:380px 1fr;align-items:start}
+.g-half{grid-template-columns:1fr 1fr}
+@media(max-width:1080px){.g-dash{grid-template-columns:1fr}.g-half{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.card h3{font-size:12px;font-weight:800;letter-spacing:1.6px;color:var(--mut);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:3px 10px;border-radius:12px}
+.tag.cy{background:color-mix(in srgb,var(--cy) 12%,transparent);color:var(--cy)}
+.tag.gr{background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok)}
+.tag.rd{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
+.tag.yl{background:color-mix(in srgb,var(--warn) 13%,transparent);color:var(--warn)}
+.tag.vl{background:color-mix(in srgb,var(--vio) 12%,transparent);color:var(--vio)}
+/* gauge */
+.gwrap{position:relative;width:220px;height:220px;margin:4px auto 0}
+.gwrap svg{transform:rotate(-90deg)}
+.gtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gtxt .v{font-size:48px;font-weight:900;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+.gtxt .u{font-size:11px;color:var(--mut);margin-top:4px;letter-spacing:1.5px;text-transform:uppercase}
+.q{margin-top:9px;font-size:12px;font-weight:800;padding:4px 16px;border-radius:20px}
+.q.gr{background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok)}
+.q.yl{background:color-mix(in srgb,var(--warn) 13%,transparent);color:var(--warn)}
+.q.rd{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.tl{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.tl .tv{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:3px}
+.tl .tv small{font-size:10px;color:var(--mut);font-weight:600}
+.tl .tn{font-size:9.5px;color:var(--mut);margin-top:3px;letter-spacing:.8px;text-transform:uppercase}
+/* kv rows */
+.kv{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.kv .ki{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;background:color-mix(in srgb,var(--cy) 10%,transparent);border:1px solid color-mix(in srgb,var(--cy) 30%,transparent);flex:none}
+.kv .kt{flex:1;min-width:0}
+.kv .kt b{font-size:13px;display:block}
+.kv .kt span{display:block;font-size:11px;color:var(--mut);margin-top:1px}
+.kv .kv2{font-size:12px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar{height:7px;border-radius:6px;background:color-mix(in srgb,var(--mut) 18%,transparent);overflow:hidden;margin-top:6px}
+.bar>div{height:100%;border-radius:6px;transition:width .6s,background .6s}
+/* chart */
+.rng{display:flex;gap:6px;margin-left:auto}
+.rg{font-size:10.5px;font-weight:800;padding:4px 12px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);color:var(--mut);cursor:pointer}
+.rg.on{color:var(--cy);border-color:var(--cy)}
+canvas.ch{width:100%;height:240px;display:block;margin-top:8px}
+.leg{display:flex;gap:16px;margin-top:6px;font-size:10.5px;color:var(--mut);flex-wrap:wrap}
+.leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+/* alerts */
+.al{border-left:3px solid var(--mut);background:var(--panel2);border-radius:10px;padding:10px 13px;margin-top:8px}
+.al .at{font-size:9.5px;color:var(--mut);font-family:monospace;display:flex;justify-content:space-between;gap:8px}
+.al .am{font-size:12.5px;margin-top:3px;line-height:1.45}
+.al.WARN{border-color:var(--warn)} .al.CRITICAL{border-color:var(--crit);background:color-mix(in srgb,var(--crit) 6%,var(--panel2))} .al.INFO{border-color:#60a5fa}
+.demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.dbtn{font-size:12px;font-weight:700;padding:12px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer;transition:.15s}
+.dbtn:hover{transform:translateY(-1px)}
+.dbtn.red{border-color:color-mix(in srgb,var(--crit) 45%,transparent);color:var(--crit)}
+.dbtn.grn{border-color:color-mix(in srgb,var(--ok) 45%,transparent);color:var(--ok)}
+/* map */
+.mapwrap{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.mapwrap svg,.mapwrap canvas{position:absolute;inset:0;width:100%;height:100%}
+.mapholder{position:relative;width:100%;aspect-ratio:16/10}
+.mtitle{position:absolute;top:10px;left:14px;font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--mut);text-transform:uppercase;z-index:5}
+.mlegend{position:absolute;bottom:10px;left:14px;display:flex;gap:12px;font-size:10px;color:var(--mut);z-index:5;background:color-mix(in srgb,var(--bg) 60%,transparent);padding:6px 12px;border-radius:10px}
+.mlegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.pin{cursor:pointer}
+.pin circle.pc{transition:r .2s}
+.pin:hover circle.pc{r:13}
+.pin text{font-size:7.5px;font-weight:800;fill:var(--txt);paint-order:stroke;stroke:#000;stroke-width:.8px}
+[data-theme="light"] .pin text{stroke:#fff}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{color:var(--mut);text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent);font-variant-numeric:tabular-nums}
+td.r,th.r{text-align:right}
+.twrap{overflow-x:auto}
+.mono{font-family:'SF Mono',Consolas,monospace}
+/* ai lab bars */
+.lab{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.lb{display:grid;grid-template-columns:110px 1fr 90px 64px;gap:10px;align-items:center;font-size:12px}
+.lb .bn{color:var(--mut);font-weight:600}
+.lb .bv{font-family:monospace;font-weight:700;text-align:right}
+.lb .bl{text-align:right;font-size:10px;color:var(--mut)}
+@media(max-width:640px){.lb{grid-template-columns:90px 1fr 80px 54px}}
+/* nodes */
+.nd{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}
+.nd .nn{flex:1;min-width:0}
+.nd .nn b{font-size:13.5px}
+.nd .nn span{display:block;font-size:10.5px;color:var(--mut);margin-top:2px}
+.nd .nq{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+/* sms modal */
+.mback{position:fixed;inset:0;background:rgba(2,6,12,.72);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.mback.on{display:flex}
+.smsph{width:min(380px,94vw);background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:20px;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.smsph .sh{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.smsph .sh .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#22d3ee,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:16px}
+.smsph .sh b{font-size:13.5px}
+.smsph .sh span{display:block;font-size:10px;color:var(--ok)}
+.bub{margin-top:14px;background:color-mix(in srgb,var(--cy) 10%,var(--panel2));border:1px solid color-mix(in srgb,var(--cy) 30%,transparent);
+  border-radius:4px 16px 16px 16px;padding:12px 14px;font-size:13px;line-height:1.55}
+.bub .bt{font-size:9.5px;color:var(--mut);margin-top:6px;text-align:right}
+.smsnote{font-size:11px;color:var(--mut);margin-top:12px;text-align:center}
+/* tour */
+.tourback{position:fixed;inset:0;background:rgba(2,6,12,.78);z-index:110;display:none}
+.tourpop{position:fixed;z-index:111;width:min(330px,90vw);background:var(--panel);border:1px solid var(--cy);border-radius:16px;padding:18px;display:none;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.tourpop b{color:var(--cy);font-size:14px}
+.tourpop p{font-size:12.5px;color:var(--mut);margin-top:7px;line-height:1.55}
+.tourrow{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.tourrow .st2{font-size:10.5px;color:var(--mut)}
+.tbtn{font-size:12px;font-weight:800;padding:8px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer}
+.tbtn.pri{background:linear-gradient(90deg,var(--cy),#3b82f6);color:#04121f;border:none}
+/* about */
+.ab{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.ab .card p{font-size:12.5px;color:var(--mut);line-height:1.6}
+.ab .card p b{color:var(--txt)}
+.mchip{display:inline-block;font-size:11px;font-weight:700;color:var(--vio);background:color-mix(in srgb,var(--vio) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--vio) 30%,transparent);border-radius:14px;padding:4px 11px;margin:3px 4px 0 0}
+.footer{border-top:1px solid var(--line);margin-top:26px;padding:22px;text-align:center;font-size:11.5px;color:var(--mut)}
+.footer b{color:var(--cy)}
+/* ===== v1.1 additions ===== */
+/* offline banner */
+.offban{display:none;margin-bottom:16px;background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:14px;padding:12px 16px;font-size:12.5px;align-items:center;gap:10px}
+.offban.on{display:flex}
+.offban b{color:var(--warn)}
+/* role fleet strip */
+.fleet{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.fch{flex:1;min-width:140px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.fch b{font-size:22px;display:block;font-variant-numeric:tabular-nums}
+.fch span{font-size:9.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px}
+/* decision log */
+.dlog{max-height:210px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.dlrow{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--cy);border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.5}
+.dlrow .dt{font-size:9.5px;color:var(--mut);font-family:monospace}
+.dlrow .why{color:var(--mut)}
+.dlrow.crit{border-left-color:var(--crit)}
+.dlrow .modechg{font-weight:800;color:var(--cy)}
+.dlrow.crit .modechg{color:var(--crit)}
+/* tickets */
+.tk{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-top:8px;font-size:12px}
+.tk .tki{flex:1;min-width:0}
+.tk .tki b{font-size:12.5px;display:block}
+.tk .tki span{font-size:10.5px;color:var(--mut);display:block;margin-top:2px;line-height:1.5}
+.tkbtn{font-size:10.5px;font-weight:800;padding:5px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--cy);cursor:pointer;white-space:nowrap}
+.ackb{font-size:9.5px;font-weight:800;padding:3px 11px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--cy);cursor:pointer}
+/* forecast rows */
+.frow{display:grid;grid-template-columns:1.5fr .6fr 1.2fr 1.2fr;gap:8px;align-items:center;padding:9px 6px;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent);font-size:12px}
+.frow.hd{color:var(--mut);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px}
+@media(max-width:640px){.frow{grid-template-columns:1.4fr .6fr 1fr}}
+input[type=range]{accent-color:var(--cy)}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 13px;cursor:pointer}
+.switch .led{width:9px;height:9px;border-radius:50%;background:var(--mut)}
+.switch.on .led{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP ================= -->
+<div class="top">
+  <div class="topin">
+    <svg class="lg" viewBox="0 0 48 48"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+      <path d="M24 4C24 4 9 20 9 30a15 15 0 0 0 30 0C39 20 24 4 24 4Z" fill="url(#lg)"/>
+      <path d="M17 31a7 7 0 0 0 7 7" stroke="#050b14" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <circle cx="31" cy="14" r="3.4" fill="#34d399"/></svg>
+    <div class="logo"><b>Jal<span>Netra</span> AI</b><small data-i="tagline">Team AquaLens · SIH26040 · Govt. of Jharkhand</small></div>
+    <div class="tctl">
+      <select class="sel" id="roleSel" title="Role view">
+        <option value="citizen" data-i="r1">👤 Citizen</option>
+        <option value="panchayat" data-i="r2">🏛 Panchayat</option>
+        <option value="phed" selected data-i="r3">🏢 PHED Official</option>
+      </select>
+      <select class="sel" id="langSel" title="Language">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="nag">ᱨᱮ ᱱᱟᱜᱽᱯᱩᱨᱤ (Nagpuri)</option>
+      </select>
+      <button class="tbn" id="themeBtn" title="Theme">☀️</button>
+      <button class="tbn" id="tourBtn" title="Help tour">❓</button>
+      <div class="live"><span class="ldot"></span><span id="netState" data-i="live">LIVE</span></div>
+    </div>
+  </div>
+  <div class="tabs" id="tabs">
+    <div class="tb on" data-p="dash"><span class="ic">📊</span><span data-i="n_dash">Dashboard</span></div>
+    <div class="tb" data-p="map"><span class="ic">🗺️</span><span data-i="n_map">Plume Map</span></div>
+    <div class="tb" data-p="lab" data-roles="panchayat,phed"><span class="ic">🧠</span><span data-i="n_lab">AI Virtual Lab</span></div>
+    <div class="tb" data-p="alerts"><span class="ic">🔔</span><span data-i="n_al">Alerts &amp; SMS</span><span class="tag rd" id="alBadge" style="display:none">0</span></div>
+    <div class="tb" data-p="nodes"><span class="ic">🛰️</span><span data-i="n_nodes">Network</span></div>
+    <div class="tb" data-p="tech" data-roles="phed"><span class="ic">🔧</span><span data-i="n_tech">Technician</span></div>
+    <div class="tb" data-p="data"><span class="ic">🗄</span><span data-i="n_data">Data Log</span></div>
+    <div class="tb" data-p="about"><span class="ic">ℹ️</span><span data-i="n_about">About</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ================= DASHBOARD ================= -->
+<div class="page on" id="pg-dash">
+  <div class="offban" id="offBan">📵 <b>Uplink lost</b><span>— node keeps sampling and stores readings locally (store-and-forward)</span><span class="tag yl" id="offCnt" style="margin-left:auto">0 buffered</span></div>
+  <div class="fleet" id="fleetStrip" style="display:none"></div>
+  <div class="grid g-dash">
+    <div class="grid">
+      <div class="card">
+        <h3><span data-i="tds_t">TDS · Total Dissolved Solids</span><span class="tag cy" id="liveMin">30 s telemetry</span></h3>
+        <div class="gwrap">
+          <svg width="220" height="220" viewBox="0 0 220 220">
+            <circle cx="110" cy="110" r="92" fill="none" stroke="color-mix(in srgb,var(--mut) 20%,transparent)" stroke-width="15"/>
+            <circle id="gArc" cx="110" cy="110" r="92" fill="none" stroke="#22d3ee" stroke-width="15"
+              stroke-linecap="round" stroke-dasharray="578" stroke-dashoffset="400" style="transition:stroke-dashoffset .8s,stroke .8s"/>
+          </svg>
+          <div class="gtxt"><div class="v" id="tdsV">312</div><div class="u">ppm</div><div class="q gr" id="tdsQ">GOOD</div></div>
+        </div>
+        <div class="tiles">
+          <div class="tl"><div class="tv" id="phV">7.2</div><div class="tn">pH</div></div>
+          <div class="tl"><div class="tv" id="tpV">24.3<small> °C</small></div><div class="tn" data-i="t_temp">Temp</div></div>
+          <div class="tl"><div class="tv" id="tbV">1.1<small> NTU</small></div><div class="tn" data-i="t_turb">Turbidity</div></div>
+          <div class="tl"><div class="tv" id="doV">7.6<small> mg/L</small></div><div class="tn">DO</div></div>
+          <div class="tl"><div class="tv" id="lvV">68<small> %</small></div><div class="tn" data-i="t_lvl">Water level</div></div>
+          <div class="tl"><div class="tv" id="smV">41<small> %</small></div><div class="tn" data-i="t_soil">Soil moist</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span data-i="power_t">☀️ Solar Power · node health</span></h3>
+        <div class="kv"><div class="ki">🔋</div><div class="kt"><b data-i="p_bat">Battery</b><span>LiFePO₄ 6 Ah · 3.2 V</span>
+          <div class="bar"><div id="batBar" style="width:87%;background:var(--ok)"></div></div></div><div class="kv2" id="batV">87% · 3.31 V</div></div>
+        <div class="kv"><div class="ki">☀️</div><div class="kt"><b data-i="p_sol">Solar input</b><span>10 W panel · MPIC charge ctrl</span></div><div class="kv2" id="solV">14.6 W</div></div>
+        <div class="kv"><div class="ki">🕓</div><div class="kt"><b data-i="p_aut">Autonomy</b><span data-i="p_auts">no-sun runtime estimate</span></div><div class="kv2" id="autV">3.2 days</div></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="grid g-half">
+        <div class="card">
+          <h3><span data-i="wqi_t">Water Quality Index</span><span class="tag cy">BIS 10500</span></h3>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="font-size:52px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ok)" id="wqiV">24</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13.5px;font-weight:700" id="wqiBand">Good</div>
+              <div class="bar" style="margin-top:8px"><div id="wqiBar" style="width:24%;background:var(--ok)"></div></div>
+              <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+                <span class="tag gr" id="potPill">SAFE</span>
+                <span class="tag vl" id="sigPill">CLEAN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span data-i="pur_t">⚙️ Smart Purifier</span><span class="tag cy">edge actuator</span></h3>
+          <div style="font-size:20px;font-weight:900;color:var(--cy)" id="purMode">NORMAL</div>
+          <div style="font-size:12px;color:var(--mut);margin-top:5px;line-height:1.5" id="purAct">All parameters within BIS limits</div>
+          <div class="bar" style="margin-top:12px"><div id="fBar" style="width:78%;background:var(--ok)"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:5px">
+            <span data-i="f_t">Filter cartridge life</span><b id="fPct" style="color:var(--txt)">78%</b></div>
+        </div>
+      </div>
+
+      <div class="grid g-half">
+        <div class="card">
+          <h3>⚡ AI Decision Log <span class="tag cy">why the purifier acted</span></h3>
+          <div style="font-size:11px;color:var(--mut);line-height:1.5;margin-bottom:8px">Every mode switch is logged with the readings that caused it and the relays fired. Inject a scenario to watch the AI reason.</div>
+          <div class="dlog" id="dlog"></div>
+        </div>
+        <div class="card">
+          <h3>🧪 Treatment train: raw → treated <span class="tag gr" id="trModeTag">sediment + UV</span></h3>
+          <div class="twrap"><table id="trTable"></table></div>
+          <div style="font-size:11px;color:var(--mut);margin-top:8px;line-height:1.5">Two-checkpoint rule: water is re-measured <b>after</b> treatment — the solenoid opens only when treated water passes BIS 10500.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span data-i="ch_t">📈 Water Quality Trend &amp; AI Forecast</span>
+          <span class="rng"><span class="rg on" data-r="live">LIVE 1H</span><span class="rg" data-r="24h">24 H</span><span class="rg" data-r="7d">7 D</span></span></h3>
+        <canvas class="ch" id="bigChart" width="1400" height="480"></canvas>
+        <div class="leg">
+          <span><i style="background:#22d3ee"></i>WQI</span>
+          <span><i style="background:#a78bfa"></i>TDS ×<span id="tdsScale">0.08</span></span>
+          <span><i style="background:#f87171"></i><span data-i="ch_f">AI forecast (next 6 h)</span></span>
+          <span><i style="background:var(--warn)"></i>BIS 50 limit</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center">
+          <button class="dbtn" id="csvBtn" style="padding:8px 16px">⬇ CSV</button>
+          <button class="dbtn" id="jsonBtn" style="padding:8px 16px">⬇ JSON</button>
+          <button class="dbtn" id="replayBtn" style="padding:8px 16px">⏮ Replay incident</button>
+          <input type="range" id="replayRng" min="0" max="100" value="100" style="flex:1;min-width:150px;display:none">
+          <span id="replayLbl" class="mono" style="font-size:11px;color:var(--mut);display:none"></span>
+          <button class="dbtn grn" id="liveBtn" style="padding:8px 16px;display:none">▶ Back to live</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span data-i="rep_t">📄 Community Report &amp; Actions</span></h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="dbtn" id="repBtn" style="flex:1;min-width:170px">🧾 <span data-i="rep_b">Download water report card</span></button>
+          <button class="dbtn" id="shareBtn" style="flex:1;min-width:150px">📤 <span data-i="share_b">Share status</span></button>
+          <button class="dbtn" id="sirenBtn" style="flex:1;min-width:150px">🔔 <span data-i="siren_b">Test community siren</span></button>
+          <button class="dbtn" id="ivrBtn" style="flex:1;min-width:150px">🔊 Play village IVR call</button>
+        </div>
+        <div style="font-size:11px;color:var(--mut);margin-top:10px;line-height:1.5" data-i="rep_note">
+          The report card is generated on-device and printable — panchayats paste it on the pump-house wall or forward it on WhatsApp.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MAP ================= -->
+<div class="page" id="pg-map">
+  <div class="card">
+    <h3><span data-i="map_t">🗺️ Jharkhand Contamination Plume Map</span><span class="tag vl">IDW interpolation · live</span>
+      <span class="rng"><span class="rg on" data-m="wqi">WQI plume</span><span class="rg" data-m="as">Arsenic risk</span></span></h3>
+    <div class="mapholder mapwrap">
+      <canvas id="heat" width="1600" height="1000"></canvas>
+      <svg id="mapSvg" viewBox="0 0 100 62.5" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="mtitle" data-i="map_tt">Jharkhand · 6 live nodes (stylized map)</div>
+      <div class="mlegend">
+        <span><i style="background:#34d399"></i>Safe</span><span><i style="background:#fbbf24"></i>Degraded</span>
+        <span><i style="background:#f87171"></i>Unsafe</span><span style="margin-left:6px" data-i="map_hint">click a pin to inspect</span>
+      </div>
+    </div>
+    <div class="ngrid" style="margin-top:14px" id="mapCards"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>🔮 Plume Forecast <span class="tag vl">Model 6 · Holt-Winters v1.1 preview</span></h3>
+    <div style="font-size:11px;color:var(--mut);line-height:1.5;margin-bottom:6px">7-day WQI trajectory per node from recent-history trend. “Breach ETA” = projected crossing of BIS Poor (75). Drift arrows point toward the neighbouring node a plume is moving to.</div>
+    <div id="fcList"></div>
+  </div>
+</div>
+
+<!-- ================= AI LAB ================= -->
+<div class="page" id="pg-lab">
+  <div class="grid g-half">
+    <div class="card">
+      <h3><span data-i="lab_t">🧠 Soft-Sensor Virtual Lab</span><span class="tag yl" id="modelInfoBtn" style="cursor:pointer" title="Show model architecture">flagship · 5 models ⓘ</span></h3>
+      <div style="font-size:12px;color:var(--mut);line-height:1.55;margin-bottom:10px" data-i="lab_note">
+        The node measures only cheap parameters. The on-board AI estimates the expensive, dangerous ones —
+        arsenic, lead, cadmium, chromium — the way a ₹40,000 laboratory would. Values update live; red rows breach BIS 10500.</div>
+      <div class="lab" id="labList"></div>
+    </div>
+    <div class="card">
+      <h3><span data-i="lab2_t">Signature &amp; risk classifier</span></h3>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+        <div><div style="font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase" data-i="verdict">Verdict</div>
+          <div style="font-size:26px;font-weight:900" id="labVerdict">SAFE</div></div>
+        <div><div style="font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase" data-i="signature">Signature</div>
+          <div style="font-size:26px;font-weight:900;color:var(--vio)" id="labSig">CLEAN</div></div>
+        <div><div style="font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase" data-i="conf">Confidence</div>
+          <div style="font-size:26px;font-weight:900;color:var(--cy)" id="labConf">98%</div></div>
+      </div>
+      <div class="lab" id="sigBars"></div>
+      <div style="margin-top:14px;font-size:11.5px;color:var(--mut);line-height:1.55" data-i="lab2_note">
+        Signature classes drive the purifier: AMD → lime dosing · HEAVY_METAL → lock tap · FLUORIDE → alumina route ·
+        BIOLOGICAL → UV max · SALINE → RO max.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>🔬 Monthly lab verification <span class="tag gr">JJM sync · drift correction</span><span class="tag cy">As MAE 0.009 mg/L</span></h3>
+    <div style="font-size:11px;color:var(--mut);line-height:1.5;margin-bottom:6px">Every month, physical water samples from each node go to a district lab. The AI's arsenic estimates are checked against them and the model is recalibrated — screening the AI can be trusted because it is continuously audited.</div>
+    <div class="twrap"><table id="labSync"></table></div>
+  </div>
+</div>
+
+<!-- ================= ALERTS ================= -->
+<div class="page" id="pg-alerts">
+  <div class="grid g-half">
+    <div class="card">
+      <h3><span data-i="al_t">🔔 Alert Feed</span><span class="tag cy">SMS · IVR · dashboard</span></h3>
+      <div id="feed" style="max-height:520px;overflow-y:auto"></div>
+    </div>
+    <div class="card">
+      <h3><span data-i="sim_t">🧪 Inject field scenario</span><span class="tag rd">demo</span></h3>
+      <div class="demo">
+        <button class="dbtn red" onclick="inject('arsenic')">☣ <span data-i="e1">Arsenic seepage</span></button>
+        <button class="dbtn red" onclick="inject('amd')">⛏ <span data-i="e2">Acid mine drainage</span></button>
+        <button class="dbtn red" onclick="inject('sewage')">🦠 <span data-i="e3">Sewage overflow</span></button>
+        <button class="dbtn red" onclick="inject('industrial')">🏭 <span data-i="e4">Industrial dump</span></button>
+        <button class="dbtn" onclick="inject('sensor')">🔌 <span data-i="e5">Sensor fault</span></button>
+        <button class="dbtn" onclick="toggleOffline()">📵 Network outage</button>
+        <button class="dbtn" id="complainBtn">🙋 Villager complaint</button>
+        <button class="dbtn grn" onclick="inject('reset')">↺ <span data-i="e6">Reset baseline</span></button>
+      </div>
+      <h3 style="margin-top:20px"><span data-i="sms_t">📱 Village SMS preview</span><span class="tag yl" data-i="sms_tag">auto-sent on CRITICAL</span></h3>
+      <div style="font-size:11.5px;color:var(--mut);line-height:1.55" data-i="sms_note">
+        When a toxic threshold is crossed, every registered family phone in the ward receives this SMS in the local language — no smartphone or internet needed.</div>
+      <button class="dbtn" style="margin-top:10px" onclick="showSms(lastSev||'CRITICAL', lastMsg||'')">📲 <span data-i="sms_prev">Preview last SMS</span></button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>🛠 Maintenance &amp; community tickets <span class="tag yl" id="tkCount">0 open</span></h3>
+    <div style="font-size:11px;color:var(--mut);line-height:1.5">Auto-raised by the filter-life model before failure, or by villagers from the complaint button / SMS. ACK = mechanic dispatched, CLOSE = fixed on site.</div>
+    <div id="tkList"></div>
+  </div>
+</div>
+
+<!-- ================= NODES ================= -->
+<div class="page" id="pg-nodes">
+  <div class="card">
+    <h3><span data-i="net_t">🛰️ State-wide Network</span><span class="tag cy">6 of 23,000 planned</span></h3>
+    <div class="ngrid" id="nodeGrid"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3><span data-i="cmp_t">⚖️ Compare two sources</span></h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <select class="sel" id="cmpA"></select>
+      <select class="sel" id="cmpB"></select>
+    </div>
+    <div class="twrap"><table id="cmpTable"></table></div>
+  </div>
+</div>
+
+<!-- ================= TECHNICIAN ================= -->
+<div class="page" id="pg-tech">
+  <div class="grid g-half">
+    <div class="card">
+      <h3><span data-i="tech_t">🔧 Technician Mode</span><span class="tag yl">PHED maintenance</span></h3>
+      <div class="twrap"><table id="rawTable"></table></div>
+      <div style="font-size:11px;color:var(--mut);margin-top:10px" data-i="tech_note">Raw ADC counts &amp; mV before calibration — used to diagnose probe fouling or wiring faults. The AI anomaly watchdog cross-checks these.</div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3><span data-i="cal_t">Calibration</span></h3>
+        <div style="font-size:12.5px;margin:8px 0" data-i="cal_ph">pH offset (2-point buffer cal.)</div>
+        <input type="range" id="calPh" min="-0.5" max="0.5" step="0.01" value="0" style="width:100%">
+        <div style="font-size:12.5px;margin:14px 0 8px" data-i="cal_tds">TDS multiplier</div>
+        <input type="range" id="calTds" min="0.8" max="1.2" step="0.01" value="1" style="width:100%">
+        <div style="font-size:11px;color:var(--mut);margin-top:8px" data-i="cal_note">In the field: pH 4.00 &amp; 6.86 buffers, then 0.5 g/L NaCl for TDS. Values apply instantly to the dashboard.</div>
+      </div>
+      <div class="card">
+        <h3><span data-i="act_t">Actuator relay test</span></h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="relayRow">
+          <span class="switch" data-r="UV-C lamp"><span class="led"></span>UV-C</span>
+          <span class="switch" data-r="RO pump"><span class="led"></span>RO pump</span>
+          <span class="switch" data-r="Solenoid valve"><span class="led"></span>Valve</span>
+          <span class="switch" data-r="Dosing pump"><span class="led"></span>Doser</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="dbtn" id="restartBtn">⟳ Restart node</button>
+          <span class="kv2" style="align-self:center;font-size:11px;color:var(--mut)" data-i="pair">Kiosk pairing code: <b class="mono" style="color:var(--cy)" id="pairCode">JH-01-4F2A</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DATA LOG ================= -->
+<div class="page" id="pg-data">
+  <div class="card">
+    <h3>🗄 Data archive — autosaved on this device <span class="tag gr">localStorage · survives refresh</span></h3>
+    <div style="font-size:11.5px;color:var(--mut);line-height:1.55">
+      One reading per node every 30 seconds (exactly like the field units), every alert with its acknowledge/escalation
+      status, every AI decision and every ticket is written to a rolling local archive. Export any time as CSV or JSON —
+      or take the full backup straight into JJM-IMIS reporting.
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">
+      <button class="dbtn" id="dlResultsCsv" style="padding:9px 16px">⬇ Readings CSV</button>
+      <button class="dbtn" id="dlAlertsCsv" style="padding:9px 16px">⬇ Alerts CSV</button>
+      <button class="dbtn" id="dlBackup" style="padding:9px 16px">⬇ Full backup (JSON)</button>
+      <button class="dbtn red" id="wipeBtn" style="padding:9px 16px">🗑 Clear saved history</button>
+      <span class="mono" id="storeMeter" style="font-size:11px;color:var(--mut);margin-left:auto"></span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>📟 Node readings log <span class="tag cy">one row per node · every 30 s</span></h3>
+    <div class="twrap" style="max-height:420px;overflow-y:auto"><table id="resTable"></table></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>🔔 Alert archive <span class="tag yl">with ack / escalation status</span></h3>
+    <div class="twrap" style="max-height:420px;overflow-y:auto"><table id="alertLogTable"></table></div>
+  </div>
+</div>
+
+<!-- ================= ABOUT ================= -->
+<div class="page" id="pg-about">
+  <div class="ab">
+    <div class="card"><h3>💧 <span data-i="ab1">What is JalNetra AI?</span></h3>
+      <p><b>JalNetra ("water-eye")</b> is a ₹5,800 solar-powered IoT node + AI brain that watches village water 24×7 in Jharkhand's mining belt. It estimates <b>arsenic, lead, cadmium and fluoride without a laboratory</b>, computes the BIS 10500 Water Quality Index, physically controls the purifier, locks the tap when water turns toxic, and SMS-alerts families in local languages. Built by <b style="color:var(--cy)">Team AquaLens</b> for Smart India Hackathon 2026 — problem statement SIH26040, Government of Jharkhand.</p></div>
+    <div class="card"><h3>🧠 <span data-i="ab2">On-board AI (5 models)</span></h3>
+      <p style="margin-bottom:8px"><span class="mchip">Soft-Sensor Virtual Lab ★</span><span class="mchip">Potability 99.97%</span><span class="mchip">Contamination 8-class · 99.3%</span><span class="mchip">Anomaly Watchdog</span><span class="mchip">Filter-Life R² 0.95</span></p>
+      <p data-i="ab2b">Trained from scratch on 30,000 chemically-realistic samples grounded in BIS IS 10500:2012 limits and real district contamination profiles — Jharia AMD, Sahibganj arsenic, Gumla fluoride, Jamshedpur industrial.</p></div>
+    <div class="card"><h3>🏛 <span data-i="ab3">Government pillars covered</span></h3>
+      <p>① Distributed solar sensor nodes (pH, TDS, turbidity, level, soil-moisture, vibration · IP66 · GSM/LoRa) · ② multi-stage edge purification with offline rule engine · ③ cloud early-warning: plume map, forecasting, vernacular SMS · ④ affordability: ₹5,800 capex, ₹180/month opex, local-repair design.</p></div>
+    <div class="card"><h3>📡 <span data-i="ab4">This web app</span></h3>
+      <p data-i="ab4b">Runs in two modes: <b>standalone demo</b> (built-in realistic simulation — works offline, installable as a PWA) and <b>server-live</b> (auto-connects to the JalNetra FastAPI when hosted beside it). Instalable on any phone from the browser menu: "Add to Home Screen".</p></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="footer">JalNetra AI · <b>Team AquaLens</b> · SIH26040 · Hardware · Smart Automation · Govt. of Jharkhand — <span data-i="foot">"A lens on every drop."</span></div>
+
+<!-- SMS modal -->
+<div class="mback" id="smsBack" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="smsph">
+    <div class="sh"><div class="av">💬</div><div><b>JalNetra Jal Alert</b><span>online · SMS gateway</span></div>
+      <button class="tbn" style="margin-left:auto" onclick="document.getElementById('smsBack').classList.remove('on')">✕</button></div>
+    <div class="bub"><div id="smsText"></div><div class="bt" id="smsTime"></div></div>
+    <div class="smsnote" id="smsMeta"></div>
+  </div>
+</div>
+
+<!-- AI model info modal -->
+<div class="mback" id="modelBack" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="smsph" style="width:min(540px,94vw)">
+    <div class="sh"><div class="av">🧠</div><div><b>JalNetra AI engine — 5 models</b><span>built from scratch · 30,000 BIS-grounded samples</span></div>
+      <button class="tbn" style="margin-left:auto" onclick="document.getElementById('modelBack').classList.remove('on')">✕</button></div>
+    <div id="modelBody" style="margin-top:12px;font-size:12.5px;line-height:1.6;max-height:60vh;overflow-y:auto"></div>
+    <div class="smsnote">Random Forests + Isolation Forest · scikit-learn · inference &lt; 40 ms</div>
+  </div>
+</div>
+
+<!-- tour -->
+<div class="tourback" id="tourBack"></div>
+<div class="tourpop" id="tourPop">
+  <b id="tourT"></b><p id="tourD"></p>
+  <div class="tourrow"><span class="st2" id="tourStep"></span>
+    <span><button class="tbtn" id="tourSkip" style="margin-right:6px">Skip</button><button class="tbtn pri" id="tourNext">Next →</button></span></div>
+</div>
+
+<script>
+/* ================================================================
+   JalNetra AI web app — Team AquaLens
+   Standalone simulation + optional live-server hook. No dependencies.
+   ================================================================ */
+"use strict";
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+
+/* ---------------- i18n ---------------- */
+const I18N = {
+ en:{tagline:"Team AquaLens · SIH26040 · Govt. of Jharkhand",live:"LIVE",
+  n_dash:"Dashboard",n_map:"Plume Map",n_lab:"AI Virtual Lab",n_al:"Alerts & SMS",n_nodes:"Network",n_tech:"Technician",n_data:"Data Log",n_about:"About",
+  r1:"👤 Citizen",r2:"🏛 Panchayat",r3:"🏢 PHED Official",
+  t_temp:"Temp",t_turb:"Turbidity",t_lvl:"Water level",t_soil:"Soil moist",
+  ch_f:"AI forecast (next 6 h)",e1:"Arsenic seepage",e2:"Acid mine drainage",e3:"Sewage overflow",e4:"Industrial dump",e5:"Sensor fault",e6:"Reset baseline",
+  foot:"\u201CA lens on every drop.\u201D"},
+ hi:{tagline:"टीम एक्वालेंस · SIH26040 · झारखंड सरकार",live:"लाइव",
+  n_dash:"डैशबोर्ड",n_map:"प्लूम मैप",n_lab:"एआई प्रयोगशाला",n_al:"अलर्ट व SMS",n_nodes:"नेटवर्क",n_tech:"तकनीशियन",n_data:"डेटा लॉग",n_about:"बारे में",
+  r1:"👤 नागरिक",r2:"🏛 पंचायत",r3:"🏢 फ़ीड अधिकारी",
+  t_temp:"तापमान",t_turb:"मैलापन",t_lvl:"जल स्तर",t_soil:"मिट्टी नमी",
+  ch_f:"एआई पूर्वानुमान (अगले 6 घं.),",e1:"आर्सेनिक रिसाव",e2:"अम्लीय माइन जल",e3:"सीवेज ओवरफ़्लो",e4:"औद्योगिक अपशिष्ट",e5:"सेंसर खराबी",e6:"रीसेट",
+  foot:"\u201Cहर बूंद पर नज़र।\u201D"},
+ nag:{tagline:"टीम एक्वालेंस · SIH26040 · झारखंड सरकार",live:"लाइव",
+  n_dash:"डैशबोर्ड",n_map:"पानी नक्सा",n_lab:"एआई लैब",n_al:"सतर्क व SMS",n_nodes:"नेटवर्क",n_tech:"मिस्त्री",n_data:"डेटा लॉग",n_about:"हमार बारे",
+  r1:"👤 गांव के लोग",r2:"🏛 पंचायत",r3:"🏢 फ़ीड अफ़सर",
+  t_temp:"गरमी",t_turb:"मैला",t_lvl:"पानी लेवल",t_soil:"माटी चिकना",
+  ch_f:"एआई अगाउ कहथ (6 घंटा)",e1:"आर्सेनिक रिसै",e2:"खान के खट्टा पानी",e3:"गंदा पानी",e4:"कारखाना कचरा",e5:"सेंसर डिग",e6:"पहिले जैसे",
+  foot:"\u201Cहर बूंद पर नजर।\u201D"}
+};
+let LANG="en";
+const T=k=>(I18N[LANG][k]||I18N.en[k]||k);
+function applyLang(){
+  document.querySelectorAll("[data-i]").forEach(el=>{const v=T(el.dataset.i);if(v)el.innerHTML=v;});
+}
+
+/* ---------------- nodes & simulation ---------------- */
+const NODES=[
+ {id:"JH-01",n:"Bhandaridah",       d:"Bokaro",         x:62,y:44,sc:"clean"},
+ {id:"JH-02",n:"Jharia Coal Belt",  d:"Dhanbad",        x:71,y:40,sc:"amd"},
+ {id:"JH-03",n:"Sahibganj Belt",    d:"Sahibganj",      x:87,y:17,sc:"arsenic"},
+ {id:"JH-04",n:"Gumla Block",       d:"Gumla",          x:34,y:47,sc:"fluoride"},
+ {id:"JH-05",n:"Jamshedpur Fringe", d:"East Singhbhum", x:66,y:47.5,sc:"industrial"},
+ {id:"JH-06",n:"Buruhatu Village",  d:"Ranchi",         x:48,y:42,sc:"biological"},
+];
+const PROFILE={
+ clean:     {tds:300,ph:7.2,turb:0.9,wqi:22, pot:"SAFE",  sig:"CLEAN",      conf:.98,mode:"NORMAL",  act:"All parameters within BIS limits",
+             lab:{arsenic:.003,lead:.003,fluoride:.4,iron:.12,cadmium:.0004,chromium:.006,coliform:0,nitrate:6}},
+ arsenic:   {tds:520,ph:7.1,turb:3.0,wqi:68, pot:"UNSAFE",sig:"HEAVY_METAL",conf:.92,mode:"LOCKED", act:"Arsenic above BIS limit — output locked, PHED lab notified",
+             lab:{arsenic:.062,lead:.008,fluoride:.5,iron:.4,cadmium:.0007,chromium:.01,coliform:4,nitrate:14}},
+ amd:       {tds:1250,ph:4.4,turb:12,wqi:135,pot:"UNSAFE",sig:"ACIDIC_AMD", conf:.95,mode:"DOSE_LIME",act:"Acid mine drainage — lime dosing + aeration engaged",
+             lab:{arsenic:.009,lead:.012,fluoride:.3,iron:2.8,cadmium:.0018,chromium:.02,coliform:0,nitrate:9}},
+ sewage:    {tds:560,ph:6.9,turb:16,wqi:88, pot:"UNSAFE",sig:"BIOLOGICAL", conf:.94,mode:"UV_MAX", act:"Coliform surge — maximum UV + chlorination",
+             lab:{arsenic:.004,lead:.005,fluoride:.4,iron:.3,cadmium:.0005,chromium:.008,coliform:160,nitrate:30}},
+ industrial:{tds:860,ph:6.5,turb:7, wqi:95, pot:"UNSAFE",sig:"HEAVY_METAL",conf:.90,mode:"LOCKED", act:"Pb + Cr above limits — output locked",
+             lab:{arsenic:.012,lead:.052,fluoride:.45,iron:1.1,cadmium:.004,chromium:.09,coliform:2,nitrate:26}},
+ fluoride:  {tds:540,ph:7.7,turb:1.2,wqi:52, pot:"UNSAFE",sig:"FLUORIDE",   conf:.93,mode:"ALUMINA", act:"Fluoride high — activated-alumina cartridge routing",
+             lab:{arsenic:.004,lead:.004,fluoride:2.2,iron:.2,cadmium:.0005,chromium:.007,coliform:0,nitrate:10}},
+ biological:{tds:520,ph:7.0,turb:14,wqi:80, pot:"UNSAFE",sig:"BIOLOGICAL", conf:.96,mode:"UV_MAX", act:"Coliform detected — UV disinfection maximum",
+             lab:{arsenic:.005,lead:.006,fluoride:.4,iron:.5,cadmium:.0006,chromium:.009,coliform:120,nitrate:22}},
+};
+const S={};   // per-node live state
+NODES.forEach((n,i)=>{
+  const p=PROFILE[n.sc];
+  S[n.id]={...p, tds:p.tds, ph:p.ph, turb:p.turb, wqi:p.wqi, temp:rnd(22,29), do:rnd(5,8),
+    lvl:rnd(45,85), soil:rnd(25,60), bat:rnd(.78,.96), sol:rnd(8,16), filt:rnd(35,95),
+    sensorFault:0, hist:[], week:[], phase:rnd(0,6.28)};
+  // seed 24h history (5-min) + 7d (30-min)
+  const now=Date.now();
+  for(let k=288;k>0;k--){const t=now-k*3e5;S[n.id].hist.push({t,wqi:diurnal(p.wqi,t,n.id),tds:p.tds});}
+  for(let k=336;k>0;k--){const t=now-k*18e5;S[n.id].week.push({t,wqi:diurnal(p.wqi,t,n.id),tds:p.tds});}
+});
+function diurnal(base,t,id){
+  const h=new Date(t).getHours()+new Date(t).getMinutes()/60;
+  return clamp(base + 5*Math.sin((h/24)*2*Math.PI*2 + S[id].phase) + rnd(-2,2), base>10?base-6:5, base+14);
+}
+let SEL="JH-01";
+let calPh=0, calTds=1;
+
+/* ---------------- alerts ---------------- */
+let ALERTS=[], unread=0, lastSev="CRITICAL", lastMsg="", alertSeq=0;
+function push(sev,msg,silent){
+  ALERTS.unshift({id:++alertSeq,sev,msg,ts:new Date(),acked:sev==="INFO",esc:false});
+  if(ALERTS.length>40)ALERTS.pop();
+  if(sev!=="INFO"){unread++;badge();}
+  if(sev==="CRITICAL"&&!silent){lastSev=sev;lastMsg=msg;showSms(sev,msg);alarm();}
+  drawFeed();
+  saveSoon();
+}
+function ackAlert(id){
+  const a=ALERTS.find(x=>x.id===id); if(!a||a.acked)return;
+  a.acked=true;
+  push("INFO",`Alert ACKNOWLEDGED by ${ROLE.toUpperCase()} desk — response timer stopped`,true);
+  drawFeed();
+}
+/* escalation ladder: un-acked WARN/CRITICAL escalate to district after 20 s (demo = 20 min field time) */
+function checkEscalations(){
+  const now=Date.now();
+  ALERTS.forEach(a=>{
+    if(!a.acked&&!a.esc&&a.sev!=="INFO"&&now-a.ts.getTime()>20000){
+      a.esc=true;
+      push("INFO",`No acknowledgement — alert escalated: Panchayat → District PHED control room (auto-ladder, 20 min field time)`,true);
+    }
+  });
+}
+function badge(){const b=$("alBadge");b.style.display=unread?"inline-block":"none";b.textContent=unread;}
+function drawFeed(){
+  $("feed").innerHTML = ALERTS.length?ALERTS.map(a=>
+    `<div class="al ${a.sev}"><div class="at"><span>${a.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span><span>${a.sev}${a.esc?" · ⬆ DISTRICT":""}${a.acked&&a.sev!=="INFO"?" · ACK ✓":""}</span></div><div class="am">${a.msg}</div>${(!a.acked)?`<div style="margin-top:6px"><button class="ackb" onclick="ackAlert(${a.id})">✓ Acknowledge</button></div>`:""}</div>`
+  ).join(""):`<div class="al INFO"><div class="am">No alerts — all sources nominal.</div></div>`;
+  drawAlertLog();
+}
+const SMS_TEXT={
+  en:(n,m)=>`JAL ALERT ${n}: Water UNSAFE (${m}). DO NOT DRINK until siren clears. JalNetra/AquaLens`,
+  hi:(n,m)=>`जल चेतावनी ${n}: पानी असुरक्षित (${m})। सायरन बंद होने तक पीना मना। JalNetra`,
+  nag:(n,m)=>`पानी चेतावनी ${n}: पानी खराब हे (${m})। पीना मना हे। JalNetra`};
+function showSms(sev,msg){
+  const village=NODES.find(n=>n.id===SEL).n;
+  const m = sev==="CRITICAL" ? (SMS_TEXT[LANG]||SMS_TEXT.en)(village,msg) :
+    `JalNetra: ${village} water status — ${msg}. Team AquaLens`;
+  $("smsText").textContent=m;
+  $("smsTime").textContent=new Date().toLocaleTimeString();
+  $("smsMeta").textContent=`Sent to 214 registered family phones in the ward · ${sev} · SMS gateway (MSG91)`;
+  $("smsBack").classList.add("on");
+}
+
+/* ---------------- sound + vibration ---------------- */
+let AC=null;
+function alarm(){
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime,[f1,f2]=[880,660];
+    [0,.25,.5].forEach(off=>{const o=AC.createOscillator(),g=AC.createGain();
+      o.frequency.setValueAtTime(f1,t+off);o.frequency.exponentialRampToValueAtTime(f2,t+off+.2);
+      g.gain.setValueAtTime(.12,t+off);g.gain.exponentialRampToValueAtTime(.001,t+off+.22);
+      o.connect(g).connect(AC.destination);o.start(t+off);o.stop(t+off+.24);});
+    if(navigator.vibrate)navigator.vibrate([180,80,180]);
+  }catch(e){}
+}
+
+/* ---------------- scenario injection ---------------- */
+const EVENTS={
+  arsenic:{sc:"arsenic",msg:"ARSENIC 0.062 mg/L — above BIS 0.05. Tap LOCKED. SMS sent to 214 families"},
+  amd:{sc:"amd",msg:"pH 4.3 — Acid Mine Drainage signature. Lime dosing engaged"},
+  sewage:{sc:"sewage",msg:"Coliform surge detected — UV MAX + chlorination engaged"},
+  industrial:{sc:"industrial",msg:"Pb 0.052 / Cr 0.09 mg/L — industrial dump signature. Output LOCKED"},
+  reset:{sc:"clean",msg:"Source reset to baseline — all parameters recovering to nominal"},
+};
+function inject(ev){
+  const st=S[SEL];
+  if(ev==="sensor"){ st.sensorFault=25; push("WARN","Turbidity sensor drifting (stuck+rise pattern) — anomaly watchdog engaged"); render(); return; }
+  const e=EVENTS[ev]; if(!e)return;
+  Object.assign(st,PROFILE[e.sc],{tds:PROFILE[e.sc].tds,ph:PROFILE[e.sc].ph,turb:PROFILE[e.sc].turb,wqi:PROFILE[e.sc].wqi});
+  st.lab=PROFILE[e.sc].lab;
+  push(e.sc==="clean"?"INFO":"CRITICAL", e.msg);
+  render();
+}
+
+/* ---------------- tick ---------------- */
+let tickCnt=0;
+function tick(){
+  NODES.forEach(n=>{const st=S[n.id],b=st;
+    st.tds=clamp(st.tds+rnd(-14,14)+(b.tds-st.tds)*.10,60,2600);
+    st.ph =clamp(st.ph +rnd(-.05,.05)+(b.ph -st.ph)*.10,3.2,9.5);
+    st.turb=clamp(st.turb+rnd(-.3,.3)+(b.turb-st.turb)*.10+(st.sensorFault>0?0.6:0),.1,60);
+    st.wqi=clamp(st.wqi+rnd(-1.1,1.1)+(b.wqi-st.wqi)*.10,5,220);
+    st.temp=clamp(st.temp+rnd(-.06,.06),18,33);
+    st.bat=clamp(st.bat-(n.sc==="clean"?.0002:.0004)+ (Math.sin(Date.now()/6e5)>0?.0006:0),.2,1);
+    st.filt=clamp(st.filt-.003*(1+st.turb/8),5,100);
+    st.lvl=clamp(st.lvl+rnd(-.4,.4),20,98);
+    st.soil=clamp(st.soil+rnd(-.5,.5),10,90);
+    if(st.sensorFault>0)st.sensorFault--;
+    st.hist.push({t:Date.now(),wqi:st.wqi,tds:st.tds}); if(st.hist.length>500)st.hist.shift();
+    /* Model 5 — filter-life predictive maintenance: auto-raise ticket below 30% */
+    if(st.filt<30&&!st.tkOpen){st.tkOpen=true;
+      addTicket(n.id,n.n,"RO / UV-C cartridge",Math.round(st.filt),12,"district mechanic","PREDICTIVE");
+      push("WARN",`Ticket auto-raised — ${n.id} filter at ${Math.round(st.filt)}% life; Model 5 predicts failure in ~12 days, mechanic dispatched BEFORE breakdown`);}
+    if(NET.down)NET.buf++;
+  });
+  checkEscalations();
+  if(NET.down)$("offCnt").textContent=NET.buf+" buffered on node";
+  /* data logger: one snapshot per node every 30 s — exactly the field sampling story */
+  if(++tickCnt>=30){ tickCnt=0; snapshotResults(); }
+  render();
+}
+
+/* ---------------- renderers ---------------- */
+function tdsBand(v){return v<=500?["GOOD","q gr","#22d3ee"]:v<=1000?["FAIR","q yl","#fbbf24"]:v<=2000?["POOR","q yl","#fb923c"]:["UNSAFE","q rd","#f87171"]; }
+function wqiCol(v){return v<=25?"#34d399":v<=50?"#22d3ee":v<=75?"#fbbf24":v<=100?"#fb923c":"#f87171";}
+function wqiWord(v){return v<=25?"Excellent":v<=50?"Good":v<=75?"Poor":v<=100?"Very Poor":"Unsuitable";}
+const LBL={ph:"pH",turbidity:"Turbidity",tds:"TDS",ec:"EC",temp:"Temp",do:"DO",source_type:"source_type",near_mine_km:"near_mine_km"};
+function render(){
+  const st=S[SEL], node=NODES.find(n=>n.id===SEL);
+  // gauge
+  const col=tdsBand(st.tds*calTds)[2];
+  $("tdsV").textContent=Math.round(st.tds*calTds); $("tdsV").style.color=col;
+  $("gArc").setAttribute("stroke-dashoffset",578*(1-clamp(st.tds*calTds/2000,0,1)));
+  $("gArc").setAttribute("stroke",col);
+  const [q,qc]=tdsBand(st.tds*calTds); $("tdsQ").textContent=q; $("tdsQ").className=qc;
+  // tiles
+  const ph=st.ph+calPh;
+  $("phV").textContent=ph.toFixed(1); $("phV").style.color=(ph>=6.5&&ph<=8.5)?"":"var(--crit)";
+  $("tpV").innerHTML=st.temp.toFixed(1)+"<small> °C</small>";
+  $("tbV").innerHTML=st.turb.toFixed(1)+"<small> NTU</small>"; $("tbV").style.color=st.turb>5?"var(--crit)":st.turb>1?"var(--warn)":"";
+  $("doV").innerHTML=st.do.toFixed(1)+"<small> mg/L</small>";
+  $("lvV").innerHTML=Math.round(st.lvl)+"<small> %</small>";
+  $("smV").innerHTML=Math.round(st.soil)+"<small> %</small>";
+  // wqi + verdict
+  const wc=wqiCol(st.wqi);
+  $("wqiV").textContent=Math.round(st.wqi); $("wqiV").style.color=wc;
+  $("wqiBand").textContent=wqiWord(st.wqi);
+  $("wqiBar").style.width=clamp(st.wqi,2,100)+"%"; $("wqiBar").style.background=wc;
+  const pot=$("potPill"); pot.textContent=st.pot; pot.className="tag "+(st.pot==="SAFE"?"gr":st.pot==="MODERATE"?"yl":"rd");
+  const sig=$("sigPill"); sig.textContent=st.sig;
+  // purifier + filter
+  $("purMode").textContent=st.mode; $("purMode").style.color=st.mode==="LOCKED"?"var(--crit)":"var(--cy)";
+  $("purAct").textContent=st.act;
+  $("fBar").style.width=st.filt+"%"; $("fBar").style.background=st.filt>50?"var(--ok)":st.filt>20?"var(--warn)":"var(--crit)";
+  $("fPct").textContent=Math.round(st.filt)+"%";
+  // solar
+  $("batBar").style.width=(st.bat*100)+"%"; $("batBar").style.background=st.bat>.4?"var(--ok)":"var(--crit)";
+  $("batV").textContent=Math.round(st.bat*100)+"% · "+(3.1+st.bat*.22).toFixed(2)+" V";
+  $("solV").textContent=st.sol.toFixed(1)+" W";
+  $("autV").textContent=(st.bat*6/.08/24).toFixed(1)+" days";
+  // decision log: explain any purifier mode change, then render everything
+  if(PREVMODE[SEL]!==undefined&&PREVMODE[SEL]!==st.mode)logDecision(node,st);
+  PREVMODE[SEL]=st.mode;
+  drawBig(); drawLab(); drawMapCards(); drawNodes(); drawCompare(); drawRaw();
+  drawTreated(); drawFleet(); drawForecast();
+  document.title=`${node.n} · WQI ${Math.round(st.wqi)} — JalNetra`;
+}
+
+/* ---------------- big chart with forecast ---------------- */
+let RANGE="live";
+document.querySelectorAll(".rg[data-r]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".rg[data-r]").forEach(x=>x.classList.remove("on"));b.classList.add("on");RANGE=b.dataset.r;render();
+});
+function linreg(ys){const n=ys.length;let sx=0,sy=0,sxy=0,sxx=0;ys.forEach((y,x)=>{sx+=x;sy+=y;sxy+=x*y;sxx+=x*x;});
+  const d=n*sxx-sx*sx;return d?((n*sxy-sx*sy)/d):0;}
+function drawBig(){
+  const c=$("bigChart"),x=c.getContext("2d"),W=c.width,H=c.height,pd={l:56,r:16,t:16,b:30};
+  x.clearRect(0,0,W,H);
+  const st=S[SEL];
+  let pts, step=3e5, fcN=72;
+  if(RANGE==="live"){pts=st.hist.slice(-360).map((p,i,a)=>({t:p.t,wqi:p.wqi,tds:p.tds})); step=1e3; fcN=0;}
+  else if(RANGE==="24h"){pts=st.hist.slice(); }
+  else {pts=st.week.slice();}
+  if(RANGE!=="live"){ // thin to <=400
+    while(pts.length>400)pts=pts.filter((_,i)=>i%2===0);
+  }
+  // forecast (not in live mode)
+  let fc=[];
+  if(fcN&&pts.length>20){
+    const tail=pts.slice(-48).map(p=>p.wqi);
+    const slope=linreg(tail), last=tail[tail.length-1], t0=pts[pts.length-1].t;
+    for(let k=1;k<=fcN;k++){
+      const tt=t0+k*step, h=new Date(tt).getHours();
+      const v=clamp(last+slope*k*.25+6*Math.sin(h/24*4*Math.PI),5,220);
+      fc.push({t:tt,wqi:v});
+    }
+  }
+  const t0=pts[0].t, t1=(fc.length?fc[fc.length-1].t:pts[pts.length-1].t);
+  const vals=pts.concat(fc).flatMap(p=>[p.wqi,p.tds*.08]);
+  let mn=Math.min(...vals,45),mx=Math.max(...vals);
+  const pdg=(mx-mn)*.12||5;mn-=pdg;mx+=pdg;
+  const X=t=>pd.l+(W-pd.l-pd.r)*(t-t0)/(t1-t0);
+  const Y=v=>pd.t+(H-pd.t-pd.b)*(1-(v-mn)/(mx-mn));
+  // grid
+  x.font="16px monospace";x.fillStyle=getCss("--mut");x.strokeStyle=getCss("--line");x.lineWidth=1;
+  for(let g=0;g<=5;g++){const v=mn+(mx-mn)*g/5,y=Y(v);
+    x.beginPath();x.moveTo(pd.l,y);x.lineTo(W-pd.r,y);x.stroke();x.fillText(Math.round(v),8,y+5);}
+  // BIS 50 line
+  x.strokeStyle="#fbbf24";x.setLineDash([8,8]);x.beginPath();x.moveTo(pd.l,Y(50));x.lineTo(W-pd.r,Y(50));x.stroke();x.setLineDash([]);
+  // series
+  function line(arr,key,color,dash,fill){
+    x.beginPath();x.strokeStyle=color;x.lineWidth=3.5;x.lineJoin="round";if(dash)x.setLineDash([10,8]);
+    arr.forEach((p,i)=>{const px=X(p.t),py=Y(key==="wqi"?p.wqi:p.tds*.08);i?x.lineTo(px,py):x.moveTo(px,py);});
+    x.stroke();x.setLineDash([]);
+    if(fill&&arr.length>1){x.lineTo(X(arr[arr.length-1].t),H-pd.b);x.lineTo(X(arr[0].t),H-pd.b);x.closePath();
+      const g=x.createLinearGradient(0,pd.t,0,H);g.addColorStop(0,color+"2e");g.addColorStop(1,color+"00");x.fillStyle=g;x.fill();}
+  }
+  line(pts,"wqi","#22d3ee",false,true);
+  line(pts,"tds","#a78bfa",true,false);
+  if(fc.length)line(fc,"wqi","#f87171",true,false);
+  // now marker
+  if(fc.length){x.fillStyle="#f87171";x.beginPath();x.arc(X(pts[pts.length-1].t),Y(pts[pts.length-1].wqi),5,0,7);x.fill();}
+  // replay cursor
+  if(REPLAY&&pts.length){
+    const rr=$("replayRng"); rr.max=pts.length-1;
+    const ri=clamp(+rr.value,0,pts.length-1), rp=pts[ri];
+    const cx=X(rp.t), cy=Y(rp.wqi);
+    x.strokeStyle="rgba(255,255,255,.6)";x.setLineDash([4,4]);
+    x.beginPath();x.moveTo(cx,pd.t);x.lineTo(cx,H-pd.b);x.stroke();x.setLineDash([]);
+    x.fillStyle="#fff";x.beginPath();x.arc(cx,cy,6,0,7);x.fill();
+    x.font="600 17px monospace";x.fillStyle="#eaf2fb";
+    x.fillText(`◉ replay: WQI ${Math.round(rp.wqi)} · TDS ${Math.round(rp.tds)} ppm · ${new Date(rp.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`,clamp(cx+12,pd.l+8,W-pd.r-430),pd.t+20);
+    $("replayLbl").textContent="⚓ "+new Date(rp.t).toLocaleString();
+  }
+  // time labels
+  x.fillStyle=getCss("--mut");
+  const d0=new Date(t0),d1=new Date(t1);
+  x.fillText(d0.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),pd.l,H-8);
+  x.fillText(d1.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),W-pd.r-110,H-8);
+}
+function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||"#888";}
+
+/* ---------------- AI lab ---------------- */
+const LAB_ROWS=[["arsenic","Arsenic",.01,"mg/L"],["lead","Lead",.01,"mg/L"],["cadmium","Cadmium",.003,"mg/L"],
+  ["chromium","Chromium",.05,"mg/L"],["fluoride","Fluoride",1.0,"mg/L"],["iron","Iron",.3,"mg/L"],
+  ["nitrate","Nitrate",45,"mg/L"],["coliform","Coliform",0,"MPN"]];
+function drawLab(){
+  const st=S[SEL], lab=st.lab;
+  $("labList").innerHTML=LAB_ROWS.map(([k,n,lim,u])=>{
+    const v=lab[k]??0, bad=lim>0?v>lim:v>0, warn=!bad&&lim>0&&v>lim*.6;
+    const pct=lim>0?clamp(v/lim*100,2,100):(v>0?100:2);
+    return `<div class="lb"><span class="bn">${n}</span>
+      <div class="bar"><div style="width:${pct}%;background:${bad?"var(--crit)":warn?"var(--warn)":"var(--ok)"}"></div></div>
+      <span class="bv" style="color:${bad?"var(--crit)":"var(--txt)"}">${fmtV(v)}</span>
+      <span class="bl">${lim} ${u}</span></div>`;
+  }).join("");
+  $("labVerdict").textContent=st.pot;
+  $("labVerdict").style.color=st.pot==="SAFE"?"var(--ok)":st.pot==="MODERATE"?"var(--warn)":"var(--crit)";
+  $("labSig").textContent=st.sig.replace(/_/g," ");
+  $("labConf").textContent=Math.round(st.conf*100)+"%";
+  const entries=[["CLEAN",st.sig==="CLEAN"?.86:.02],["HEAVY_METAL",st.sig==="HEAVY_METAL"?.83:.03],
+    ["ACIDIC_AMD",st.sig==="ACIDIC_AMD"?.9:.02],["FLUORIDE",st.sig==="FLUORIDE"?.88:.02],
+    ["BIOLOGICAL",st.sig==="BIOLOGICAL"?.85:.03],["IRON_MANGANESE",st.sig==="IRON_MANGANESE"?.6:.06],
+    ["SALINE_TDS",st.sig==="SALINE_TDS"?.5:.04],["MIXED",st.sig==="MIXED"?.7:.05]];
+  const top=entries.sort((a,b)=>b[1]-a[1]).slice(0,5);
+  $("sigBars").innerHTML=top.map(([k,v])=>
+    `<div class="lb"><span class="bn" style="font-family:monospace;font-size:10.5px">${k.replace(/_/g," ")}</span>
+     <div class="bar"><div style="width:${(v*100).toFixed(0)}%;background:var(--vio)"></div></div>
+     <span class="bv">${(v*100).toFixed(0)}%</span><span class="bl"></span></div>`).join("");
+}
+function fmtV(v){return v>=1?v.toFixed(2):v>=.01?v.toFixed(3):v.toFixed(4);}
+
+/* ---------------- map ---------------- */
+let MAPMODE="wqi";
+document.querySelectorAll(".rg[data-m]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".rg[data-m]").forEach(x=>x.classList.remove("on"));b.classList.add("on");MAPMODE=b.dataset.m;drawHeat();
+});
+const JH_POLY="38,10 52,7 60,11 68,8 78,11 90,9 96,17 91,24 94,31 87,36 89,44 82,49 85,57 78,63 80,72 72,78 74,86 64,90 56,86 48,91 39,87 30,90 23,83 25,73 16,67 11,58 17,50 9,44 13,34 22,31 20,22 29,18 33,21";
+function buildMap(){
+  const svg=$("mapSvg");
+  let pins="";
+  NODES.forEach(nd=>{
+    const st=S[nd.id];
+    pins+=`<g class="pin" data-id="${nd.id}" transform="translate(${nd.x},${nd.y})">
+      <circle class="pc" r="9" fill="${wqiCol(st.wqi)}" fill-opacity=".9" stroke="#fff" stroke-width="1"/>
+      <circle r="16" fill="none" stroke="${wqiCol(st.wqi)}" stroke-opacity=".4" stroke-width="1">
+        <animate attributeName="r" values="12;22;12" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="stroke-opacity" values=".5;0;.5" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+      <text y="-12" text-anchor="middle">${nd.id}</text></g>`;
+  });
+  svg.innerHTML=`<g transform="scale(.625)"><polygon points="${JH_POLY}" fill="color-mix(in srgb,var(--cy) 7%,transparent)"
+      stroke="color-mix(in srgb,var(--cy) 45%,transparent)" stroke-width=".8"/>${pins}</g>`;
+  svg.querySelectorAll(".pin").forEach(p=>p.onclick=()=>selectNode(p.dataset.id));
+}
+function drawHeat(){
+  const c=$("heat"),x=c.getContext("2d");x.clearRect(0,0,c.width,c.height);
+  // scale svg->canvas: svg viewbox 100x62.5 group scaled .625 => node x,y are 0-100 space over full width; y 0-100*? Actually transform scale(.625) maps 0-100 -> 0-62.5 of viewbox; canvas 1600x960 = viewbox*16
+  const kx=c.width/100, ky=c.height/62.5;
+  NODES.forEach(nd=>{
+    const v=MAPMODE==="wqi"?S[nd.id].wqi:S[nd.id].lab.arsenic*800;
+    const col=wqiCol(v), r=(MAPMODE==="wqi"?clamp(v,20,160):clamp(v,10,80))*9;
+    const px=nd.x*kx, py=nd.y*ky;
+    const g=x.createRadialGradient(px,py,0,px,py,r);
+    g.addColorStop(0,col+"66");g.addColorStop(.6,col+"22");g.addColorStop(1,col+"00");
+    x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();
+  });
+}
+function drawMapCards(){
+  $("mapCards").innerHTML=NODES.map(nd=>{const st=S[nd.id];
+    return `<div class="nd" style="cursor:pointer;${nd.id===SEL?"border-color:var(--cy)":""}" onclick="selectNode('${nd.id}')">
+      <div class="nn"><b>${nd.n}</b><span>${nd.id} · ${nd.d} · ${st.sig.replace(/_/g," ")}</span></div>
+      <div class="nq" style="color:${wqiCol(st.wqi)}">${Math.round(st.wqi)}</div>
+      <span class="tag ${st.pot==="SAFE"?"gr":st.pot==="MODERATE"?"yl":"rd"}">${st.pot}</span></div>`;
+  }).join("");
+}
+function selectNode(id){SEL=id;render();buildMap();drawHeat();
+  push("INFO",`Inspecting ${NODES.find(n=>n.id===id).n} (${id})`,true);}
+
+/* ---------------- nodes + compare ---------------- */
+function drawNodes(){
+  $("nodeGrid").innerHTML=NODES.map(nd=>{const st=S[nd.id];
+    return `<div class="nd"><div class="nn"><b>${nd.n}</b><span>${nd.id} · ${nd.d}</span>
+      <span style="margin-top:4px">☀ ${Math.round(st.bat*100)}% · 🔧 ${Math.round(st.filt)}% life</span></div>
+      <div class="nq" style="color:${wqiCol(st.wqi)}">${Math.round(st.wqi)}</div>
+      <span class="tag ${st.pot==="SAFE"?"gr":st.pot==="MODERATE"?"yl":"rd"}">${st.pot}</span></div>`;
+  }).join("");
+}
+function fillCmp(){
+  const opts=NODES.map(n=>`<option value="${n.id}">${n.id} · ${n.n}</option>`).join("");
+  $("cmpA").innerHTML=opts;$("cmpB").innerHTML=opts;$("cmpA").value="JH-01";$("cmpB").value="JH-02";
+  $("cmpA").onchange=$("cmpB").onchange=drawCompare;
+}
+function drawCompare(){
+  const a=S[$("cmpA").value],b=S[$("cmpB").value];
+  if(!a||!b)return;
+  const rows=[["WQI",Math.round(a.wqi),Math.round(b.wqi)],["TDS",Math.round(a.tds)+" ppm",Math.round(b.tds)+" ppm"],
+    ["pH",a.ph.toFixed(1),b.ph.toFixed(1)],["Turbidity",a.turb.toFixed(1)+" NTU",b.turb.toFixed(1)+" NTU"],
+    ["Verdict",a.pot,b.pot],["Signature",a.sig.replace(/_/g," "),b.sig.replace(/_/g," ")],
+    ["Actuator",a.mode,b.mode],["Filter life",Math.round(a.filt)+"%",Math.round(b.filt)+"%"],
+    ["Battery",Math.round(a.bat*100)+"%",Math.round(b.bat*100)+"%"]];
+  $("cmpTable").innerHTML=`<tr><th>Metric</th><th>${$("cmpA").value}</th><th>${$("cmpB").value}</th></tr>`+
+    rows.map(r=>`<tr><td style="color:var(--mut)">${r[0]}</td><td><b>${r[1]}</b></td><td><b>${r[2]}</b></td></tr>`).join("");
+}
+
+/* ---------------- technician ---------------- */
+function drawRaw(){
+  const st=S[SEL];
+  const rows=[["pH probe",st.ph,1342+st.ph*90,"mV"],["TDS probe",Math.round(st.tds),st.tds*1.6,"mV"],
+    ["Turbidity",st.turb.toFixed(1),2600-st.turb*40,"mV"],["DS18B20",st.temp.toFixed(1),"—","1-Wire"],
+    ["Level (sonic)",Math.round(st.lvl)+"%","—","µs"],["Soil moist",Math.round(st.soil)+"%",st.soil*20,"mV"],
+    ["Vibration","idle","—","int"],["Uplink RSSI",-rnd(52,74)+" dBm","—","WiFi"]];
+  $("rawTable").innerHTML=`<tr><th>Channel</th><th class="r">Value</th><th class="r">Raw</th><th class="r">Unit</th></tr>`+
+    rows.map(r=>`<tr><td>${r[0]}</td><td class="r"><b>${r[1]}</b></td><td class="r mono">${typeof r[2]==="number"?Math.round(r[2]):r[2]}</td><td class="r" style="color:var(--mut)">${r[3]}</td></tr>`).join("");
+}
+$("calPh").oninput=e=>{calPh=+e.target.value;render();};
+$("calTds").oninput=e=>{calTds=+e.target.value;render();};
+document.querySelectorAll("#relayRow .switch").forEach(sw=>sw.onclick=()=>sw.classList.toggle("on"));
+$("restartBtn").onclick=()=>{push("INFO","Node restart requested — firmware v1.0 reinitializing",true);
+  $("pairCode").textContent="JH-01-"+Math.random().toString(16).slice(2,6).toUpperCase();};
+
+/* ---------------- tiny QR generator (byte/ECC-L/v1-5) ---------------- */
+/* -------- compact QR generator: byte mode · ECC level L · versions 1–5 (single block) --------
+   Enough for URL payloads up to 106 bytes. No dependencies. */
+"use strict";
+function qrGenFixed(text, forceVer, forceMask){
+  const bytes = Array.from(new TextEncoder().encode(text));
+  const SPEC = {1:[19,7,[]], 2:[34,10,[6,18]], 3:[55,15,[6,22]], 4:[80,20,[6,26]], 5:[108,26,[6,30]]};
+  let v = forceVer || 1;
+  if(!forceVer){ while(v<=5 && bytes.length > SPEC[v][0]-2) v++; }
+  if(v>5) throw new Error("payload too long for QR v5-L");
+  const dcw = SPEC[v][0], eccLen = SPEC[v][1], align = SPEC[v][2];
+  const s = 17 + 4*v;
+
+  /* --- bit stream: byte mode --- */
+  let bits = [];
+  const push = (val,len)=>{ for(let i=len-1;i>=0;i--) bits.push((val>>>i)&1); };
+  push(4,4);                    // 0100 = byte mode
+  push(bytes.length,8);         // v1-9 → 8-bit count
+  bytes.forEach(b=>push(b,8));
+  const capBits = dcw*8;
+  push(0, Math.min(4, capBits - bits.length));   // terminator
+  while(bits.length % 8) bits.push(0);
+  const dataCw = [];
+  for(let i=0;i<bits.length;i+=8) dataCw.push(parseInt(bits.slice(i,i+8).join(""),2));
+  const pad=[0xEC,0x11]; let pi=0;
+  while(dataCw.length < dcw) dataCw.push(pad[pi++ & 1]);
+
+  /* --- Reed–Solomon ECC over GF(256), poly 0x11D --- */
+  const EXP=new Array(512), LOG=new Array(256).fill(0);
+  let xv=1;
+  for(let i=0;i<255;i++){ EXP[i]=xv; LOG[xv]=i; xv<<=1; if(xv&0x100) xv^=0x11D; }
+  for(let i=255;i<512;i++) EXP[i]=EXP[i-255];
+  const mul=(a,b)=> (a&&b) ? EXP[LOG[a]+LOG[b]] : 0;
+  function pmul(p,q){ const r=new Array(p.length+q.length-1).fill(0);
+    p.forEach((a,i)=>q.forEach((b,j)=>r[i+j]^=mul(a,b))); return r; }
+  let gp=[1]; for(let i=0;i<eccLen;i++) gp=pmul(gp,[1,EXP[i]]);
+  const ecc=new Array(eccLen).fill(0);
+  dataCw.forEach(b=>{ const f=b ^ ecc.shift(); ecc.push(0);
+    gp.slice(1).forEach((g,i)=> ecc[i] ^= mul(g,f)); });
+  const code = dataCw.concat(ecc);
+
+  /* --- base matrix: function patterns --- */
+  const m  = Array.from({length:s},()=>new Array(s).fill(false));
+  const fm = Array.from({length:s},()=>new Array(s).fill(false));
+  function setM(x,y,val,func){ m[y][x]=!!val; if(func) fm[y][x]=true; }
+  function drawFinder(cx,cy){
+    for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){
+      const xx=cx+dx, yy=cy+dy, d=Math.max(Math.abs(dx),Math.abs(dy));
+      if(0<=xx&&xx<s&&0<=yy&&yy<s) setM(xx,yy,(d!==2&&d!==4),true);
+    }
+  }
+  drawFinder(3,3); drawFinder(s-4,3); drawFinder(3,s-4);
+  for(let i=8;i<s-8;i++){ setM(i,6,i%2===0,true); setM(6,i,i%2===0,true); }   // timing
+  if(align.length===2){
+    const b=align[1];
+    [[6,b],[b,6],[b,b]].forEach(([cx,cy])=>{
+      // skip corners already covered by finders
+      if(fm[cy][cx]) return;
+      for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)
+        setM(cx+dx,cy+dy, Math.max(Math.abs(dx),Math.abs(dy))!==1, true);
+    });
+  }
+  // dark module
+  setM(8, s-8, true, true);
+  // reserve format cells
+  function formatCells(){
+    const pts=[];
+    for(let i=0;i<=5;i++)pts.push([8,i]);
+    pts.push([8,7],[8,8],[7,8]);
+    for(let i=9;i<15;i++)pts.push([14-i,8]);
+    for(let i=0;i<8;i++)pts.push([s-1-i,8]);
+    for(let i=8;i<15;i++)pts.push([8,s-15+i]);
+    return pts;
+  }
+  formatCells().forEach(([x,y])=>{ fm[y][x]=true; });
+
+  /* --- data zigzag placement --- */
+  {
+    let i=0, up=true;
+    for(let right=s-1; right>=1; right-=2){
+      if(right===6) right=5;
+      for(let vert=0; vert<s; vert++){
+        for(let j=0;j<2;j++){
+          const xx=right-j, yy=up ? s-1-vert : vert;
+          if(fm[yy][xx]) continue;
+          let bit=false;
+          if(i < code.length*8){ bit = ((code[i>>>3] >>> (7-(i&7))) & 1) !== 0; i++; }
+          m[yy][xx]=bit;
+        }
+      }
+      up=!up;
+    }
+  }
+
+  function maskBit(mask,x,y){
+    switch(mask){
+      case 0: return (x+y)%2===0;
+      case 1: return y%2===0;
+      case 2: return x%3===0;
+      case 3: return (x+y)%3===0;
+      case 4: return (Math.floor(y/2)+Math.floor(x/3))%2===0;
+      case 5: return (x*y)%2 + (x*y)%3 === 0;
+      case 6: return ((x*y)%2 + (x*y)%3)%2===0;
+      case 7: return ((x+y)%2 + (x*y)%3)%2===0;
+    }
+  }
+  function drawFormat(mm, mask){
+    const dat=(1<<3)|mask;              // ECC L = 01
+    let rem=dat;
+    for(let i=0;i<10;i++) rem=(rem<<1) ^ ((rem>>>9)*0x537);
+    const b=(((dat<<10)|rem) ^ 0x5412) & 0x7FFF;
+    const bit=(v2,i)=>((v2>>>i)&1)!==0;
+    const pts=formatCells();
+    // matching mapping: recreate placement order per spec positions
+    const seq=[];
+    for(let i=0;i<=5;i++)seq.push([8,i,bit(b,i)]);
+    seq.push([8,7,bit(b,6)],[8,8,bit(b,7)],[7,8,bit(b,8)]);
+    for(let i=9;i<15;i++)seq.push([14-i,8,bit(b,i)]);
+    for(let i=0;i<8;i++)seq.push([s-1-i,8,bit(b,i)]);
+    for(let i=8;i<15;i++)seq.push([8,s-15+i,bit(b,i)]);
+    seq.forEach(([x,y,val])=>{ mm[y][x]=val; });
+    mm[s-8][8]=true;
+  }
+  function penalty(mm){
+    let pen=0;
+    for(let i=0;i<s;i++){
+      [[true,i],[false,i]].forEach(([horiz,idx])=>{
+        const arr=[]; for(let k=0;k<s;k++) arr.push(horiz?mm[idx][k]:mm[k][idx]);
+        let run=1;
+        for(let k=1;k<s;k++){ if(arr[k]===arr[k-1]){ run++; if(run===5)pen+=3; else if(run>5)pen++; } else run=1; }
+        const str=arr.map(z=>z?1:0).join("");
+        ["10111010000","00001011101"].forEach(pt=>{
+          let p=str.indexOf(pt); while(p>=0){ pen+=40; p=str.indexOf(pt,p+1); } });
+      });
+    }
+    for(let r=0;r<s-1;r++)for(let c=0;c<s-1;c++){
+      const cc=mm[r][c];
+      if(cc===mm[r+1][c]&&cc===mm[r][c+1]&&cc===mm[r+1][c+1]) pen+=3;
+    }
+    let dark=0; mm.forEach(row=>row.forEach(z=>z&&dark++));
+    const total=s*s;
+    pen += Math.floor(Math.abs(dark*20 - total*10)/total)*10;
+    return pen;
+  }
+
+  if(forceMask!==undefined && forceMask!==null){
+    const mm=m.map(r=>r.slice());
+    for(let y=0;y<s;y++)for(let x=0;x<s;x++) if(!fm[y][x] && maskBit(forceMask,x,y)) mm[y][x]=!mm[y][x];
+    drawFormat(mm, forceMask);
+    return {size:s, m:mm, mask:forceMask, ver:v};
+  }
+  let best=null,bestPen=Infinity,bestMask=0;
+  for(let mask=0;mask<8;mask++){
+    const mm=m.map(r=>r.slice());
+    for(let y=0;y<s;y++)for(let x=0;x<s;x++) if(!fm[y][x] && maskBit(mask,x,y)) mm[y][x]=!mm[y][x];
+    drawFormat(mm, mask);
+    const p=penalty(mm);
+    if(p<bestPen){ bestPen=p; best=mm; bestMask=mask; }
+  }
+  return {size:s, m:best, mask:bestMask, ver:v};
+}
+function qrGen(text){ return qrGenFixed(text, null, null); }
+
+/* ---------------- report card ---------------- */
+$("repBtn").onclick=()=>{
+  const node=NODES.find(n=>n.id===SEL),st=S[SEL];
+  const cv=document.createElement("canvas");cv.width=900;cv.height=1150;const x=cv.getContext("2d");
+  x.fillStyle="#0b1626";x.fillRect(0,0,900,1150);
+  x.fillStyle="#22d3ee";x.font="900 54px sans-serif";x.fillText("JalNetra Water Report",50,110);
+  x.fillStyle="#7e93b0";x.font="600 24px sans-serif";
+  x.fillText(`Team AquaLens · SIH26040 · ${new Date().toLocaleString()}`,50,155);
+  x.fillText(`${node.n} · ${node.id} · ${node.d} district, Jharkhand`,50,195);
+  x.fillStyle="#101f38";x.strokeStyle="#1b2d4a";x.lineWidth=2;
+  [[50,240],[500,240],[50,560],[500,560]].forEach(([bx,by])=>{x.fillRect(bx,by,350,280);x.strokeRect(bx,by,350,280);});
+  x.fillStyle="#7e93b0";x.font="800 22px sans-serif";x.fillText("WQI (BIS 10500)",80,300);
+  x.fillStyle=wqiCol(st.wqi);x.font="900 110px sans-serif";x.fillText(Math.round(st.wqi),80,420);
+  x.font="700 30px sans-serif";x.fillText(wqiWord(st.wqi),80,480);
+  x.fillStyle="#7e93b0";x.font="800 22px sans-serif";x.fillText("VERDICT",530,300);
+  x.fillStyle=st.pot==="SAFE"?"#34d399":"#f87171";x.font="900 72px sans-serif";x.fillText(st.pot,530,400);
+  x.fillStyle="#7e93b0";x.font="600 22px sans-serif";x.fillText("signature: "+st.sig.replace(/_/g," "),530,460);
+  x.fillStyle="#7e93b0";x.font="800 22px sans-serif";x.fillText("KEY PARAMETERS",80,620);
+  x.fillStyle="#eaf2fb";x.font="600 24px monospace";
+  [["TDS",Math.round(st.tds)+" ppm"],["pH",st.ph.toFixed(1)],["Turbidity",st.turb.toFixed(1)+" NTU"],["Actuator",st.mode]]
+    .forEach(([k,v],i)=>{x.fillStyle="#7e93b0";x.fillText(k,80,670+i*40);x.fillStyle="#eaf2fb";x.fillText(v,300,670+i*40);});
+  x.fillStyle="#7e93b0";x.font="800 22px sans-serif";x.fillText("AI VIRTUAL LAB (estimates)",530,620);
+  x.font="600 22px monospace";
+  [["Arsenic",fmtV(st.lab.arsenic),.01],["Lead",fmtV(st.lab.lead),.01],["Fluoride",fmtV(st.lab.fluoride),1.0]]
+    .forEach(([k,v,lim],i)=>{x.fillStyle="#7e93b0";x.fillText(k,530,670+i*40);
+      x.fillStyle=st.lab[k]>lim?"#f87171":"#34d399";x.fillText(v+" mg/L",730,670+i*40);});
+  x.fillStyle="#34d399";x.font="800 26px sans-serif";
+  x.fillText("AI-SCREENED · LAB CONFIRMATION DISPATCHED ON BREACH",50,940);
+  x.fillStyle="#7e93b0";x.font="600 20px sans-serif";
+  x.fillText("This report is auto-generated on the node and signed by the JalNetra AI pipeline.",50,1000);
+  x.fillText("Report ID: "+SEL+"-"+Date.now().toString(36).toUpperCase(),50,1040);
+  // scannable QR → live dashboard of this node
+  try{
+    const q=qrGen(`https://jalnetra.app/w/${SEL}?wqi=${Math.round(st.wqi)}&v=${st.pot}`.toLowerCase().replace(/\+/g,"%2b"));
+    const qs=5, px0=672, py0=950, sz=q.size*qs;
+    x.fillStyle="#ffffff"; x.fillRect(px0-14,py0-14,sz+28,sz+28);
+    x.fillStyle="#0b1626";
+    for(let r=0;r<q.size;r++)for(let c2=0;c2<q.size;c2++)if(q.m[r][c2])x.fillRect(px0+c2*qs,py0+r*qs,qs,qs);
+    x.fillStyle="#7e93b0"; x.font="600 17px sans-serif";
+    x.fillText("Scan → live dashboard of this node", px0-14, py0+sz+42);
+  }catch(err){ console.warn("QR skipped:",err); }
+  const a=document.createElement("a");a.download=`JalNetra_Report_${SEL}.png`;a.href=cv.toDataURL("image/png");a.click();
+  push("INFO","Water report card generated & downloaded",true);
+};
+$("shareBtn").onclick=async()=>{
+  const node=NODES.find(n=>n.id===SEL),st=S[SEL];
+  const text=`JalNetra · ${node.n}: WQI ${Math.round(st.wqi)} (${wqiWord(st.wqi)}) — ${st.pot}. ${st.act}. — Team AquaLens`;
+  try{ if(navigator.share){await navigator.share({title:"JalNetra Water Status",text});return;} }catch(e){}
+  try{await navigator.clipboard.writeText(text);push("INFO","Status copied to clipboard",true);}catch(e){push("INFO",text,true);}
+};
+$("sirenBtn").onclick=()=>{alarm();push("WARN","Community siren test — 5 s hoot + village LED board flashing",true);};
+
+/* ---------------- role / lang / theme / tabs ---------------- */
+let ROLE="phed";
+$("roleSel").onchange=e=>{ROLE=e.target.value;applyRole();};
+function applyRole(){
+  document.querySelectorAll(".tb[data-roles]").forEach(tb=>{
+    tb.style.display=tb.dataset.roles.split(",").includes(ROLE)?"":"none";});
+  const cur=document.querySelector(".tb.on");
+  if(cur&&cur.style.display==="none")document.querySelector('.tb[data-p="dash"]').click();
+  push("INFO",`Role view: ${ROLE.toUpperCase()}`,true);
+}
+$("langSel").onchange=e=>{LANG=e.target.value;applyLang();drawFeed();};
+$("themeBtn").onclick=()=>{
+  const l=document.documentElement.getAttribute("data-theme")==="light";
+  document.documentElement.setAttribute("data-theme",l?"dark":"light");
+  $("themeBtn").textContent=l?"☀️":"🌙";render();
+};
+document.querySelectorAll(".tb").forEach(tb=>tb.onclick=()=>{
+  document.querySelectorAll(".tb").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("on"));
+  tb.classList.add("on");$("pg-"+tb.dataset.p).classList.add("on");
+  if(tb.dataset.p==="map"){buildMap();drawHeat();}
+  if(unread&&tb.dataset.p==="alerts"){unread=0;badge();}
+});
+
+/* ---------------- tour ---------------- */
+const TOUR=[
+  {t:"Welcome to JalNetra AI",d:"This is the live command centre your team demos to judges — solar IoT nodes, AI soft-sensors, purifier control and village alerts in one screen.",x:.5,y:.5},
+  {t:"Dashboard",d:"Gauge, tiles, WQI verdict, purifier mode, solar health — all update every second from the simulated node (or the real server when connected).",x:.5,y:.5},
+  {t:"Plume Map",d:"Open the Plume Map tab: contamination heat-plumes over Jharkhand. Click any pin to inspect that village node.",x:.5,y:.5},
+  {t:"Inject a crisis",d:"Go to Alerts & SMS → tap 'Arsenic seepage'. Watch the verdict flip, tap lock, SMS popup, siren sound and the map turn red.",x:.5,y:.5},
+  {t:"AI explains itself",d:"Back on the Dashboard: the AI Decision Log shows WHY the purifier switched mode (readings → signature → exact relays fired), and the raw→treated table proves what each filter stage removed.",x:.5,y:.5},
+  {t:"Tickets, escalation & offline",d:"Alerts can be acknowledged — ignore one and it escalates to the district. Filter-life tickets auto-raise before failure, villagers can file complaints, and 'Network outage' proves store-and-forward buffering. Exports: CSV/JSON + incident replay on the chart.",x:.5,y:.5},
+  {t:"You're ready",d:"Everything runs offline in demo mode and auto-connects to the real JalNetra server when hosted beside it. — Team AquaLens 💧",x:.5,y:.5},
+];
+let tourI=0;
+function tourShow(i){
+  tourI=i;const step=TOUR[i];
+  $("tourT").textContent=step.t;$("tourD").textContent=step.d;
+  $("tourStep").textContent=`${i+1} / ${TOUR.length}`;
+  $("tourBack").style.display="block";$("tourPop").style.display="block";
+  $("tourPop").style.left="50%";$("tourPop").style.top="50%";
+  $("tourPop").style.transform="translate(-50%,-50%)";
+  $("tourNext").textContent=i===TOUR.length-1?"Finish ✓":"Next →";
+}
+function tourEnd(){$("tourBack").style.display="none";$("tourPop").style.display="none";}
+$("tourNext").onclick=()=>tourI<TOUR.length-1?tourShow(tourI+1):tourEnd();
+$("tourSkip").onclick=tourEnd;
+$("tourBack").onclick=tourEnd;
+$("tourBtn").onclick=()=>tourShow(0);
+let stored=false;try{stored=localStorage.getItem("jl_tour")=="1";}catch(e){}
+if(!stored){tourShow(0);try{localStorage.setItem("jl_tour","1");}catch(e){}}
+
+
+/* =============== v1.1 feature modules — Team AquaLens =============== */
+
+/* ---------- 1 · AI decision log (why the purifier acted) ---------- */
+const PREVMODE={}, DECLOG=[];
+const RLY={
+  NORMAL:"Relay1 UV-C ON · Relay2 RO OFF · Relay4 doser OFF · Relay3 valve OPEN",
+  BOOST:"UV-C ON · RO pump ON · doser standby · valve OPEN",
+  UV_MAX:"UV-C at MAX duty · doser → chlorine trim · valve OPEN",
+  RO_MAX:"RO pump ON (max rejection) · UV-C ON · valve OPEN",
+  DOSE_LIME:"Relay4 doser PULSING lime · closed-loop pH re-check · valve OPEN",
+  ALUMINA:"flow diverted → activated-alumina bank · valve OPEN",
+  LOCKED:"Relay3 SOLENOID CLOSED — tap locked · siren fired · SMS sent"};
+function logDecision(node,st){
+  const L=st.lab, bits=[];
+  if(st.sig==="ACIDIC_AMD") bits.push(`pH ${st.ph.toFixed(1)} < 5.0 · EC/TDS rising (${Math.round(st.tds)} ppm) · signature ACID MINE DRAINAGE @ ${Math.round(st.conf*100)}%`);
+  else if(st.sig==="HEAVY_METAL") bits.push(`virtual lab over BIS: As ${fmtV(L.arsenic)} · Pb ${fmtV(L.lead)} · Cr ${fmtV(L.chromium)} mg/L · signature HEAVY METAL @ ${Math.round(st.conf*100)}%`);
+  else if(st.sig==="FLUORIDE") bits.push(`virtual lab F ${fmtV(L.fluoride)} mg/L > 1.0 · TDS normal (not salinity) · signature FLUORIDE @ ${Math.round(st.conf*100)}%`);
+  else if(st.sig==="BIOLOGICAL") bits.push(`turbidity ${st.turb.toFixed(1)} NTU · temp ${st.temp.toFixed(1)} °C · coliform est. ${L.coliform} MPN · signature BIOLOGICAL @ ${Math.round(st.conf*100)}%`);
+  else bits.push("all key parameters back inside BIS 10500 · watchdog reports sensors steady");
+  DECLOG.unshift({ts:new Date(),node:node.id,from:PREVMODE[node.id]||"—",mode:st.mode,
+    crit:(st.mode==="LOCKED"||st.pot==="UNSAFE"),why:bits[0],relay:RLY[st.mode]||"—"});
+  if(DECLOG.length>14)DECLOG.pop();
+  drawDlog();
+}
+function drawDlog(){
+  const el=$("dlog"); if(!el)return;
+  el.innerHTML = DECLOG.length ? DECLOG.map(d=>
+    `<div class="dlrow ${d.crit?"crit":""}"><div class="dt">${d.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})} · ${d.node} · ${d.from} →</div>
+     <div><span class="modechg">⚡ ${d.mode}</span> <span class="why">— because ${d.why}</span></div>
+     <div class="why" style="margin-top:2px">→ relays: ${d.relay}</div></div>`
+  ).join("") : `<div class="dlrow"><div>No mode changes yet — inject a field scenario and watch the AI reason here.</div></div>`;
+}
+
+/* ---------- 2 · treatment train: raw → treated ---------- */
+function remPct(a,b){ return a>0 ? ("−"+Math.max(0,Math.round((1-b/a)*100))+"%") : "—"; }
+function drawTreated(){
+  const st=S[SEL]; if(!$("trTable"))return;
+  const ro=(st.mode==="RO_MAX"||st.mode==="LOCKED"||st.mode==="BOOST");
+  const alumina=(st.mode==="ALUMINA"), lime=(st.mode==="DOSE_LIME"), uvMax=(st.mode==="UV_MAX");
+  const TXT={NORMAL:"sediment + UV",BOOST:"sediment + RO + UV",UV_MAX:"sediment + UV max + chlorine",
+    RO_MAX:"sediment + RO max + UV",DOSE_LIME:"sediment + lime dose + UV",ALUMINA:"sediment + alumina + UV",
+    LOCKED:"full bank running · output locked"};
+  $("trModeTag").textContent=TXT[st.mode]||st.mode;
+  const rawPh=st.ph+calPh, outPh=lime?Math.min(7.2,rawPh+2.7):(rawPh<6.5?Math.min(6.8,rawPh+0.4):rawPh);
+  const rawTds=st.tds*calTds, outTds=rawTds*(ro?0.12:0.99);
+  const rawTurb=st.turb, outTurb=rawTurb*0.09;
+  const rawAs=st.lab.arsenic, outAs=rawAs*(ro?0.06:1);
+  const rawPb=st.lab.lead,  outPb=rawPb*(ro?0.07:1);
+  const rawF=st.lab.fluoride, outF=rawF*(alumina?0.13:ro?0.12:1);
+  const rows=[
+    ["Turbidity",rawTurb.toFixed(1)+" NTU",outTurb.toFixed(1)+" NTU","sediment "+remPct(rawTurb,outTurb),"≤1–5",outTurb<=5],
+    ["pH",rawPh.toFixed(1),outPh.toFixed(1),lime?"lime close-loop":"—","6.5–8.5",outPh>=6.5&&outPh<=8.5],
+    ["TDS",Math.round(rawTds)+" ppm",Math.round(outTds)+" ppm",ro?"RO "+remPct(rawTds,outTds):"sediment only","≤500",outTds<=500],
+    ["Arsenic",fmtV(rawAs)+" mg/L",ro?fmtV(outAs)+" mg/L":"RO idle — passes",ro?"RO "+remPct(rawAs,outAs):"—","≤0.01",ro?outAs<=0.01:rawAs<=0.01],
+    ["Lead",fmtV(rawPb)+" mg/L",ro?fmtV(outPb)+" mg/L":"RO idle — passes",ro?"RO "+remPct(rawPb,outPb):"—","≤0.01",ro?outPb<=0.01:rawPb<=0.01],
+    ["Fluoride",fmtV(rawF)+" mg/L",fmtV(outF)+" mg/L",alumina?"alumina "+remPct(rawF,outF):ro?"RO "+remPct(rawF,outF):"—","≤1.0",(alumina||ro)?outF<=1.0:rawF<=1.0],
+    ["Coliform",st.lab.coliform+" MPN","0 · inactivated",uvMax?"UV max":"UV 100%","nil",true]];
+  $("trTable").innerHTML=`<tr><th>Parameter</th><th class="r">Raw in</th><th class="r">Treated out</th><th class="r">Stage effect</th><th class="r">BIS</th><th class="r"></th></tr>`+
+    rows.map(r=>`<tr><td style="color:var(--mut)">${r[0]}</td><td class="r">${r[1]}</td><td class="r"><b>${r[2]}</b></td>
+      <td class="r" style="color:var(--cy)">${r[3]}</td><td class="r" style="color:var(--mut)">${r[4]}</td>
+      <td class="r">${r[5]?'<span class="trtag">PASS</span>':'<span class="tag rd">FAIL</span>'}</td></tr>`).join("");
+}
+
+/* ---------- 3 · IVR voice call (Web Speech) ---------- */
+$("ivrBtn").onclick=()=>{
+  if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined"){
+    push("WARN","Speech API not supported in this browser — in the field this is an automated IVR phone call",true);return;}
+  speechSynthesis.cancel();
+  const node=NODES.find(n=>n.id===SEL), st=S[SEL];
+  const text = st.pot==="SAFE"
+    ? `नमस्ते! ${node.n} का पानी सुरक्षित है। जल गुणवत्ता सूचकांक ${Math.round(st.wqi)} है। आप पानी पी सकते हैं। जलनेत्र, टीम एक्वालेंस।`
+    : `चेतावनी! ${node.n} का पानी असुरक्षित है। नल बंद कर दिया गया है। कृपया यह पानी ना पिएं। पंचायत और फेड को सूचित कर दिया गया है। जलनेत्र, टीम एक्वालेंस।`;
+  const u=new SpeechSynthesisUtterance(text); u.lang="hi-IN"; u.rate=0.95;
+  const vs=speechSynthesis.getVoices(), v=vs.find(z=>z.lang&&z.lang.toLowerCase().startsWith("hi"));
+  if(v)u.voice=v;
+  speechSynthesis.speak(u);
+  push("INFO","IVR call played on speaker — in the field this is an automated phone call to every ward family",true);
+};
+
+/* ---------- 4 · network outage (store-and-forward) ---------- */
+let NET={down:false,buf:0,timer:null,prev:"DEMO LIVE"};
+function toggleOffline(){
+  if(!NET.down){
+    NET.down=true; NET.buf=0; NET.prev=$("netState").textContent;
+    $("offBan").classList.add("on");
+    $("netState").textContent="OFFLINE · BUFFERING";
+    push("WARN","Uplink lost (WiFi/GSM/LoRa) — node keeps sampling, stores readings locally, and the purifier keeps acting on edge rules.");
+    NET.timer=setTimeout(toggleOffline,20000);
+  }else{
+    clearTimeout(NET.timer); NET.down=false;
+    $("offBan").classList.remove("on");
+    $("netState").textContent=NET.prev||"DEMO LIVE";
+    if(NET.buf>0)push("INFO",`Uplink restored — ${NET.buf} buffered readings synced to the cloud (store-and-forward complete)`);
+    NET.buf=0;
+  }
+}
+
+/* ---------- 5 · villager complaint ---------- */
+const CMPL=["“Water has tasted metallic since this morning” — Ramesh M., ward 4",
+  "“No flow at the JalNetra tap for 2 days” — Sunita D., ward 2",
+  "“Water looks yellowish after last night's rain” — Birsa T., ward 5",
+  "“Enclosure door found open, wiring exposed” — ward member"];
+let cmpI=0;
+$("complainBtn").onclick=()=>{
+  const node=NODES.find(n=>n.id===SEL), c=CMPL[cmpI++ % CMPL.length];
+  addTicket(node.id,node.n,"field service visit",null,"village water committee","COMMUNITY",c);
+  push("WARN",`Community complaint from ${node.n}: ${c}`);
+};
+
+/* ---------- 6 · tickets ---------- */
+let TICKETS=[],tkSeq=0;
+function addTicket(nodeId,nodeName,part,life,assignee,kind,note){
+  TICKETS.unshift({id:"TK-"+String(++tkSeq).padStart(3,"0"),node:`${nodeId} · ${nodeName}`,part,life,
+    due:kind==="COMMUNITY"?"SLA 24 h":"due in ~12 d",assignee,kind,note:note||"",status:"OPEN",ts:new Date()});
+  drawTickets(); drawFleet(); saveSoon();
+}
+function tkStep(i){
+  const t=TICKETS[i]; if(!t)return;
+  t.status = t.status==="OPEN" ? "ACKED" : "CLOSED";
+  if(t.status==="CLOSED") push("INFO",`${t.id} closed on-site by ${t.assignee} — service log updated`,true);
+  else push("INFO",`${t.id} acknowledged — ${t.assignee} dispatched`,true);
+  drawTickets(); drawFleet();
+}
+function drawTickets(){
+  const ct=$("tkCount"), ls=$("tkList"); if(!ct||!ls)return;
+  ct.textContent=TICKETS.filter(t=>t.status!=="CLOSED").length+" open";
+  ls.innerHTML = TICKETS.length ? TICKETS.map((t,i)=>
+    `<div class="tk"><div>${t.kind==="COMMUNITY"?"🙋":"🔧"}</div>
+     <div class="tki"><b>${t.id} · ${t.node} — ${t.part}</b>
+       <span>${t.kind==="COMMUNITY"?"community complaint":"Model-5 predictive maintenance"}${t.life!=null?" · filter life "+t.life+"%":""} · ${t.due} → ${t.assignee} · opened ${t.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+       ${t.note?`<span class="why">📝 ${t.note}</span>`:""}
+       <span>status: <b style="color:${t.status==="OPEN"?"var(--warn)":t.status==="ACKED"?"var(--cy)":"var(--ok)"}">${t.status}</b></span></div>
+     ${t.status!=="CLOSED"?`<button class="tkbtn" onclick="tkStep(${i})">${t.status==="OPEN"?"ACK ✓":"CLOSE"}</button>`:`<span class="tag gr">DONE ✓</span>`}
+    </div>`).join("")
+   : `<div class="al INFO" style="margin-top:8px"><div class="am">No open tickets — fleet healthy.</div></div>`;
+}
+
+/* ---------- 7 · role fleet strip ---------- */
+function drawFleet(){
+  const fs=$("fleetStrip"); if(!fs)return;
+  if(ROLE==="citizen"){ fs.style.display="none"; return; }
+  fs.style.display="";
+  const crit=NODES.filter(n=>S[n.id].pot!=="SAFE").length;
+  const avg=NODES.reduce((a,n)=>a+S[n.id].wqi,0)/NODES.length;
+  const open=TICKETS.filter(t=>t.status!=="CLOSED").length;
+  const minBat=Math.min(...NODES.map(n=>S[n.id].bat))*100;
+  const unack=ALERTS.filter(a=>!a.acked&&a.sev!=="INFO").length;
+  fs.innerHTML=[
+    [NODES.length,"nodes reporting","var(--cy)"],
+    [crit,crit?"source(s) UNSAFE":"all sources safe",crit?"var(--crit)":"var(--ok)"],
+    [Math.round(avg),"fleet avg WQI · "+wqiWord(avg),wqiCol(avg)],
+    [open,"open tickets",open?"var(--warn)":"var(--ok)"],
+    [unack,"un-acked alerts",unack?"var(--crit)":"var(--ok)"],
+    [Math.round(minBat)+"%","min node battery",minBat>40?"var(--ok)":"var(--crit)"]
+  ].map(([v,l,c])=>`<div class="fch"><b style="color:${c}">${v}</b><span>${l}</span></div>`).join("");
+}
+
+/* ---------- 8 · plume forecast panel (Model 6 preview) ---------- */
+function driftArrow(nd){
+  const st=S[nd.id]; if(st.wqi<45)return "stable";
+  let best=null,bd=1e9;
+  NODES.forEach(o=>{ if(o.id===nd.id)return;
+    const d=Math.hypot(o.x-nd.x,o.y-nd.y); if(d<bd){bd=d;best=o;} });
+  if(!best)return "stable";
+  const dx=best.x-nd.x, dy=best.y-nd.y;
+  const dir = dx>0? (dy<0?"↗":dy>0?"↘":"→") : (dy<0?"↖":dy>0?"↙":"←");
+  return `drift ${dir} toward ${best.id}`;
+}
+function drawForecast(){
+  const el=$("fcList"); if(!el)return;
+  el.innerHTML = `<div class="frow hd"><span>Node</span><span>WQI</span><span>7-day trend</span><span>Breach ETA · drift</span></div>`+
+  NODES.map(nd=>{
+    const st=S[nd.id];
+    const tail=st.week.slice(-48).map(p=>p.wqi);
+    const slope=linreg(tail);            // WQI pts per 30-min step
+    const perWk=slope*336;               // 7 days
+    let eta;
+    if(st.wqi>=75) eta=["already UNSAFE","var(--crit)"];
+    else if(slope>0.02) eta=[`breach 75 in ~${Math.min(99,(75-st.wqi)/slope*0.5).toFixed(0)} h`,"var(--warn)"];
+    else eta=["stable ✓","var(--ok)"];
+    const arrow=slope>0.01?`📈 +${perWk.toFixed(0)} pts/wk`:slope<-0.01?`📉 ${perWk.toFixed(0)} pts/wk`:`→ 0 pts/wk`;
+    return `<div class="frow"><span class="fb">${nd.id} · ${nd.n}</span>
+      <span style="color:${wqiCol(st.wqi)};font-weight:800">${Math.round(st.wqi)}</span>
+      <span style="color:var(--mut)">${arrow}</span>
+      <span style="color:${eta[1]}">${eta[0]} · ${driftArrow(nd)}</span></div>`;
+  }).join("");
+}
+
+/* ---------- 9 · lab verification log ---------- */
+function drawLabSync(){
+  const el=$("labSync"); if(!el)return;
+  const rows=[["JH-03 · Sahibganj Belt",0.062,0.058],["JH-05 · Jamshedpur Fringe",0.052,0.049],
+    ["JH-02 · Jharia Coal Belt",0.012,0.013],["JH-06 · Buruhatu Village",0.005,0.006],
+    ["JH-01 · Bhandaridah",0.003,0.004]];
+  el.innerHTML=`<tr><th>Node</th><th class="r">AI estimate (As, mg/L)</th><th class="r">District lab (As, mg/L)</th><th class="r">Δ error</th><th class="r">Audit</th><th class="r">Synced</th></tr>`+
+    rows.map(([n,ai,lab])=>{
+      const d=Math.abs(ai-lab);
+      return `<tr><td>${n}</td><td class="r mono">${ai.toFixed(3)}</td><td class="r mono">${lab.toFixed(3)}</td>
+        <td class="r mono">${d.toFixed(3)}</td>
+        <td class="r">${d<=0.009?'<span class="trtag">PASS ✓</span>':'<span class="tag rd">RECAL ⚠</span>'}</td>
+        <td class="r" style="color:var(--mut)">Aug 2026</td></tr>`;
+    }).join("");
+}
+
+/* ---------- 10 · AI model info modal ---------- */
+const MODELS=[
+ ["1 · Soft-Sensor Virtual Lab ★","Multi-output Random Forest — estimates 12 lab parameters (As, Pb, Cd, Cr, F, Fe, Mn, NO₃, SO₄, Cl, hardness, coliform) from the 6 cheap sensors.","As MAE 0.009 mg/L"],
+ ["2 · Potability Verdict","3-class SAFE / MODERATE / UNSAFE aligned to BIS 10500 desirable & permissible limits, calibrated confidence.","99.97% held-out accuracy"],
+ ["3 · Contamination Signature","8-class classifier that drives the purifier: AMD, heavy metal, fluoride, Fe/Mn, biological, saline, mixed, clean.","99.3% · 8 classes"],
+ ["4 · Anomaly & Fault Watchdog","Isolation Forest on the live stream — catches stuck or drifted sensors before they fool the verdict.","24×7 guard"],
+ ["5 · Filter-Life Predictor","Remaining-useful-life regression from litres treated, inlet load and backwash history — ticket before failure.","R² 0.95 · MAE ±4%"],
+ ["6 · Plume Forecast (roadmap)","Holt-Winters time-series + spatial drift between neighbour nodes — preview on the Plume Map tab.","v1.1 · in dev"]];
+$("modelInfoBtn").onclick=()=>{
+  $("modelBody").innerHTML=MODELS.map(m=>
+    `<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-bottom:8px">
+     <b style="color:var(--cy)">${m[0]}</b> <span class="trtag" style="float:right">${m[2]}</span>
+     <div style="color:var(--mut);margin-top:4px">${m[1]}</div></div>`).join("");
+  $("modelBack").classList.add("on");
+};
+
+/* ---------- 11 · CSV / JSON export + replay ---------- */
+function dl(name,content,mime){
+  const a=document.createElement("a");
+  a.download=name; a.href=URL.createObjectURL(new Blob([content],{type:mime})); a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+$("csvBtn").onclick=()=>{
+  const st=S[SEL];
+  let rows=["time,wqi,tds_ppm"];
+  st.hist.forEach(p=>rows.push(new Date(p.t).toISOString()+","+p.wqi.toFixed(1)+","+Math.round(p.tds)));
+  dl(`JalNetra_${SEL}_telemetry.csv`,rows.join("\n"),"text/csv");
+  push("INFO","Telemetry CSV exported for "+SEL+" — paste into Excel / JJM-IMIS form",true);
+};
+$("jsonBtn").onclick=()=>{
+  const node=NODES.find(n=>n.id===SEL), st=S[SEL];
+  dl(`JalNetra_${SEL}.json`,JSON.stringify({node:node.id,village:node.n,district:node.d,
+    exported:new Date().toISOString(),verdict:st.pot,signature:st.sig,series:st.hist},null,1),"application/json");
+  push("INFO","Telemetry JSON exported for "+SEL,true);
+};
+let REPLAY=false;
+$("replayBtn").onclick=()=>{
+  REPLAY=true;
+  const rr=$("replayRng"); rr.style.display=""; $("replayLbl").style.display=""; $("liveBtn").style.display="";
+  rr.max=S[SEL].hist.length-1; rr.value=rr.max; render();
+};
+$("liveBtn").onclick=()=>{
+  REPLAY=false;
+  $("replayRng").style.display="none"; $("replayLbl").style.display="none"; $("liveBtn").style.display="none";
+  render();
+};
+$("replayRng").oninput=()=>{ if(REPLAY) render(); };
+
+/* ---------- 12 · data archive: every reading, alert & decision, saved locally ---------- */
+let RESULTS=[];                      // ring buffer of node snapshots
+const STORE_KEY="jalnetra_data_v1";
+let saveT=null;
+function saveSoon(){ if(saveT)return; saveT=setTimeout(()=>{saveT=null;saveState();},1500); }
+function saveState(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      v:1, alerts:ALERTS, tickets:TICKETS, dlog:DECLOG, results:RESULTS,
+      alertSeq, tkSeq, cmpI, savedAt:Date.now()}));
+  }catch(e){}
+  drawStorageMeter();
+}
+function loadState(){
+  let d=null;
+  try{ d=JSON.parse(localStorage.getItem(STORE_KEY)||"null"); }catch(e){}
+  if(!d||!Array.isArray(d.alerts)||!d.alerts.length) return false;
+  ALERTS=d.alerts.map(a=>({...a, ts:new Date(a.ts)}));
+  TICKETS=(d.tickets||[]).map(t=>({...t, ts:new Date(t.ts)}));
+  DECLOG.push(...(d.dlog||[]).map(x=>({...x, ts:new Date(x.ts)})));
+  RESULTS.push(...(d.results||[]));
+  alertSeq=d.alertSeq||0; tkSeq=d.tkSeq||0; cmpI=d.cmpI||0;
+  TICKETS.forEach(t=>{ if(t.status!=="CLOSED"&&t.kind==="PREDICTIVE"){ const n=NODES.find(x=>t.node.startsWith(x.id)); if(n)S[n.id].tkOpen=true; } });
+  return true;
+}
+function snapshotResults(){
+  const t=Date.now();
+  NODES.forEach(n=>{
+    const st=S[n.id];
+    RESULTS.push({t, node:n.id, wqi:+st.wqi.toFixed(1), tds:Math.round(st.tds), ph:+(st.ph).toFixed(2),
+      turb:+st.turb.toFixed(1), pot:st.pot, sig:st.sig, mode:st.mode,
+      as:+st.lab.arsenic.toFixed(4), pb:+st.lab.lead.toFixed(4), f:+st.lab.fluoride.toFixed(2),
+      col:st.lab.coliform, offline:NET.down?1:0});
+  });
+  while(RESULTS.length>1200) RESULTS.splice(0, RESULTS.length-1200);
+  drawResTable(); drawStorageMeter(); saveSoon();
+}
+function drawStorageMeter(){
+  const el=$("storeMeter"); if(!el)return;
+  let kb=0; try{ kb=((localStorage.getItem(STORE_KEY)||"").length/1024); }catch(e){}
+  el.textContent=`${RESULTS.length} readings · ${ALERTS.length} alerts · ${DECLOG.length} decisions · ${TICKETS.length} tickets · ${kb.toFixed(1)} KB of ~5 MB`;
+}
+function drawResTable(){
+  const el=$("resTable"); if(!el)return;
+  const tail=RESULTS.slice(-150).reverse();
+  el.innerHTML=`<tr><th>Time</th><th>Node</th><th class="r">WQI</th><th class="r">TDS</th><th class="r">pH</th><th class="r">NTU</th><th>Verdict</th><th>Signature</th><th>Purifier</th><th class="r">As</th><th class="r">Pb</th><th class="r">F</th></tr>`+
+  (tail.map(r=>`<tr><td class="mono" style="color:var(--mut)">${new Date(r.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</td>
+    <td>${r.node}${r.offline?' <span title="buffered while offline">📵</span>':""}</td>
+    <td class="r" style="color:${wqiCol(r.wqi)};font-weight:800">${Math.round(r.wqi)}</td>
+    <td class="r">${r.tds}</td><td class="r">${r.ph}</td><td class="r">${r.turb}</td>
+    <td><span class="tag ${r.pot==="SAFE"?"gr":r.pot==="MODERATE"?"yl":"rd"}">${r.pot}</span></td>
+    <td style="color:var(--mut)">${r.sig.replace(/_/g," ")}</td><td style="color:var(--cy)">${r.mode}</td>
+    <td class="r mono">${r.as}</td><td class="r mono">${r.pb}</td><td class="r mono">${r.f}</td></tr>`).join("")
+    ||`<tr><td colspan="12" style="color:var(--mut)">Waiting for the first 30-second cycle…</td></tr>`);
+}
+function drawAlertLog(){
+  const el=$("alertLogTable"); if(!el)return;
+  const rows=ALERTS.slice(0,120);
+  el.innerHTML=`<tr><th>Time</th><th>Severity</th><th>Message</th><th class="r">Ack</th><th class="r">Escalated</th></tr>`+
+  (rows.map(a=>`<tr><td class="mono" style="color:var(--mut)">${new Date(a.ts).toLocaleString()}</td>
+    <td><span class="tag ${a.sev==="CRITICAL"?"rd":a.sev==="WARN"?"yl":"cy"}">${a.sev}</span></td>
+    <td style="max-width:520px">${a.msg}</td>
+    <td class="r">${a.sev!=="INFO"?(a.acked?"✓ yes":"— pending"):"·"}</td>
+    <td class="r">${a.esc?"⬆ district":"—"}</td></tr>`).join("")
+    ||`<tr><td colspan="5" style="color:var(--mut)">No alerts archived yet.</td></tr>`);
+}
+/* export handlers */
+$("dlResultsCsv").onclick=()=>{
+  const rows=["time,node,wqi,tds_ppm,ph,turbidity_ntu,verdict,signature,purifier_mode,arsenic_mgL,lead_mgL,fluoride_mgL,coliform_mpn,offline_buffered"];
+  RESULTS.forEach(r=>rows.push([new Date(r.t).toISOString(),r.node,r.wqi,r.tds,r.ph,r.turb,r.pot,r.sig,r.mode,r.as,r.pb,r.f,r.col,r.offline].join(",")));
+  dl("JalNetra_readings_log.csv",rows.join("\n"),"text/csv");
+  push("INFO",`Readings log exported — ${RESULTS.length} rows`,true);
+};
+$("dlAlertsCsv").onclick=()=>{
+  const rows=["time,severity,message,acknowledged,escalated"];
+  ALERTS.forEach(a=>rows.push([new Date(a.ts).toISOString(),a.sev,`"${String(a.msg).replace(/"/g,'""')}"`,a.acked?"yes":"no",a.esc?"yes":"no"].join(",")));
+  dl("JalNetra_alerts_log.csv",rows.join("\n"),"text/csv");
+  push("INFO",`Alerts log exported — ${ALERTS.length} rows`,true);
+};
+$("dlBackup").onclick=()=>{
+  dl("JalNetra_full_backup.json",JSON.stringify({meta:{team:"Team AquaLens",ps:"SIH26040",exported:new Date().toISOString()},
+    results:RESULTS,alerts:ALERTS,decisions:DECLOG,tickets:TICKETS},null,1),"application/json");
+  push("INFO","Full archive backup downloaded (JSON)",true);
+};
+/* two-step wipe so nobody fat-fingers it on stage */
+let wipeArm=false;
+$("wipeBtn").onclick=e=>{
+  const b=e.currentTarget;
+  if(!wipeArm){ wipeArm=true; b.textContent="⚠ Click again to erase archive";
+    setTimeout(()=>{ if(wipeArm){wipeArm=false; b.textContent="🗑 Clear saved history";} },4000); return; }
+  wipeArm=false; b.textContent="🗑 Clear saved history";
+  try{ localStorage.removeItem(STORE_KEY); }catch(err){}
+  ALERTS.length=0; TICKETS.length=0; DECLOG.length=0; RESULTS.length=0;
+  alertSeq=0; tkSeq=0; cmpI=0; unread=0; badge();
+  NODES.forEach(n=>{ S[n.id].tkOpen=false; });
+  drawFeed(); drawTickets(); drawDlog(); drawResTable(); drawAlertLog(); drawFleet(); drawStorageMeter();
+  push("INFO","Local archive erased — fresh run started",true);
+};
+window.addEventListener("beforeunload",()=>{ try{saveState();}catch(e){} });
+
+/* ---------------- live server hook ---------------- */
+(async()=>{
+  try{
+    const r=await fetch("/api/state?node=JH-01",{signal:AbortSignal.timeout(1500)});
+    const d=await r.json();
+    if(d&&d.result){
+      $("netState").textContent="SERVER LIVE";
+      setInterval(()=>fetch("/api/state?node="+SEL).then(r=>r.json()).then(d=>{
+        const r=d.result,st=S[SEL];
+        st.tds=r.reading.tds;st.ph=r.reading.ph;st.turb=r.reading.turbidity;st.wqi=r.wqi.value;
+        st.temp=r.reading.temp;st.mode=r.purifier.mode;st.act=r.purifier.action;
+        st.pot=r.potability.label;st.sig=r.contamination.label;st.conf=r.contamination.confidence;
+        st.filt=r.filter.life_pct;
+        st.hist.push({t:Date.now(),wqi:st.wqi,tds:st.tds});
+        render();
+      }).catch(()=>{}),2000);
+      return;
+    }
+  }catch(e){}
+  $("netState").textContent="DEMO LIVE";
+})();
+
+/* ---------------- boot ---------------- */
+const RESTORED=loadState();
+applyLang();fillCmp();buildMap();drawHeat();applyRole();
+drawDlog();drawTreated();drawLabSync();drawFleet();drawForecast();drawTickets();drawResTable();drawAlertLog();drawStorageMeter();
+if(!RESTORED){
+  S["JH-06"].filt=38;
+  addTicket("JH-06","Buruhatu Village","RO / UV-C cartridge",38,"district mechanic","PREDICTIVE","Model 5 RUL regression: exhaustion in ~12 days — replace before monsoon load");
+  S["JH-06"].tkOpen=true;
+  push("INFO","JalNetra network online — 6 nodes, solar OK, AI models loaded",true);
+  push("WARN","Filter cartridge JH-06 at 38% — service due in 12 days",true);
+}else{
+  push("INFO",`Data archive restored — ${RESULTS.length} readings · ${TICKETS.length} tickets · ${DECLOG.length} decisions · ${ALERTS.length} alerts from previous sessions`,true);
+}
+snapshotResults();
+for(let i=0;i<3;i++)tick();
+setInterval(tick,1000);
+drawFeed();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3668a186e727f4f',t:'MTc4ODYyNDk5Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37714df3d6ab2a0',t:'MTc4ODc5ODQ1Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
